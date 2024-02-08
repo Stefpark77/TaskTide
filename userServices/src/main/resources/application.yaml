@@ -1,0 +1,41 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:mysql://localhost:3306/tasktide
+    username: root
+    password: Stefpark77$
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+  kafka:
+    consumer:
+      bootstrap-servers: 192.168.100.14:29092
+      group-id: userServices
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    topic:
+      name:
+        logintest
+    bootstrap-servers: 192.168.100.14:29092
+rabbitmq:
+  queue:
+    name: signup
+  exchange:
+    name: signup_exchange
+  routing:
+    key:  signup_routing_key
+server:
+  servlet:
+    context-path: /userServices
+  port: 8081
+
+security:
+  jwt:
+    secret-key: test_secret_key
