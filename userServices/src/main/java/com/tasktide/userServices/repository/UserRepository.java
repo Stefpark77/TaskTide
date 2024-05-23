@@ -50,12 +50,6 @@ public class UserRepository {
         return newUser;
     }
 
-    public void addNewLogin(String username) {
-        User newUser = findUserByUsername(username);
-        newUser.setLastLoginDate(Instant.now());
-        iUserRepository.save(newUser);
-    }
-
     public User deleteUser(String id) {
         User user = findUserById(id);
         if(user == null) {

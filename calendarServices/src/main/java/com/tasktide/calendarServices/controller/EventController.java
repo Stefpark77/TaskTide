@@ -16,7 +16,7 @@ import java.util.List;
 @PreAuthorize("hasAnyRole({'USER', 'ADMIN'})")
 public class EventController {
 
-    EventService eventService;
+    private EventService eventService;
 
     @Autowired
     public EventController(EventService eventService) {
@@ -28,7 +28,6 @@ public class EventController {
     public Event getEventByEventId(@PathVariable String eventId) {
         return eventService.getEventByEventId(eventId);
     }
-
 
     @GetMapping("/userId/{userId}")
     @PreAuthorize("hasAnyAuthority({'userRead', 'adminRead'})")

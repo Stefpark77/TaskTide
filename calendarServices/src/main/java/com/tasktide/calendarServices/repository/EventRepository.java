@@ -24,7 +24,7 @@ public class EventRepository{
     }
 
     public List<Event> findEventsByUserId(String userId) {
-        return (List<Event>) iEventRepository.findEventsByUserIdContains(userId);
+        return (List<Event>) iEventRepository.findEventsByUserIdContainsOrderByDateAsc(userId);
     }
 
     public List<Event> findAllEvents() {
@@ -42,10 +42,11 @@ public class EventRepository{
             newEvent.setDescription(event.getDescription());
         if(event.getDate() != null)
             newEvent.setDate(event.getDate());
-        if(event.getEveryMonth() != null)
-            newEvent.setEveryMonth(event.getEveryMonth());
-        if(event.getEveryYear() != null)
-            newEvent.setEveryYear(event.getEveryYear());
+        if(event.getEndDate() != null)
+            newEvent.setEndDate(event.getEndDate());
+        if(event.getRecurringTime() != null)
+            newEvent.setRecurringTime(event.getRecurringTime());
+
         newEvent.setUpdatedDate(Instant.now());
         iEventRepository.save(newEvent);
         return newEvent;

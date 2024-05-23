@@ -1,0 +1,16 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:mysql://localhost:3306/tasktide
+    username: root
+    password: Stefpark77$
+server:
+  servlet:
+    context-path: /projectServices
+  port: 9003
+
+security:
+  jwt:
+    secret-key: test_secret_key

@@ -5,7 +5,6 @@ import com.tasktide.authServices.controller.model.Request.SignUpRequest;
 import com.tasktide.authServices.controller.model.Response.LoginResponse;
 import com.tasktide.authServices.mapper.SignUpMapper;
 import com.tasktide.authServices.model.User;
-import com.tasktide.authServices.publisher.KafkaEventProducer;
 import com.tasktide.authServices.publisher.RabbitMQProducer;
 import com.tasktide.authServices.security.JwtIssuer;
 import com.tasktide.authServices.service.AuthService;
@@ -23,7 +22,6 @@ public class AuthController {
     private final SignUpMapper signUpMapper;
     private final AuthService authService;
     private final RabbitMQProducer rabbitMQProducer;
-    private final KafkaEventProducer kafkaEventProducer;
 
     @PostMapping(value = "/sign-up")
     public void signUp(@RequestBody SignUpRequest signUpRequest) {
@@ -37,8 +35,6 @@ public class AuthController {
         if (user == null) {
             return null;
         }
-
-        kafkaEventProducer.sendMessage(user.getUsername());
 
         return LoginResponse.builder()
                 .token(jwtIssuer.issue(user.getId(), user.getUsername(), user.getRole()))

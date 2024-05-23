@@ -29,7 +29,7 @@ export const getEventByEventId = async (eventId, token) => {
     }
 }
 
-export const getEventByUserId = async (userId, token) => {
+export const getEventsByUserId = async (userId, token) => {
     try {
         const response = await axios.get(calendarServicesURL + 'event/userId/' + userId,  {
             headers: {

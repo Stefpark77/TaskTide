@@ -9,7 +9,7 @@ spring:
 server:
   servlet:
     context-path: /calendarServices
-  port: 8081
+  port: 9001
 
 security:
   jwt:

@@ -18,20 +18,19 @@ import java.util.UUID;
 @Table(name = "users")
 public class User {
     @Id
-    @Column(name = "id")
-    String id;
-    String firstName = "User";
-    String lastName;
-    String username;
-    String hashedPassword;
-    String email;
-    Instant lastLoginDate;
+    private String id;
+    private Instant createdDate = Instant.now();
+    private Instant updatedDate = Instant.now();
+
+
+    private String username;
+    private String hashedPassword;
+    private String firstName = "User";
+    private String lastName;
+    private String email;
 
     @Enumerated(EnumType.STRING)
-    Role role = Role.ADMIN;
-
-    Instant createdDate = Instant.now();
-    Instant updatedDate = Instant.now();
+    private Role role = Role.ADMIN;
 
     @PrePersist
     private void ensureId() {

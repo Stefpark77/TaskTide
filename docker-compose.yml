@@ -20,36 +20,33 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
     networks:
       - tasktide
-  zookeeper:
-    image: wurstmeister/zookeeper
-    container_name: zookeeper
-    ports:
-      - "2181:2181"
-    networks:
-      - tasktide
-  kafka:
-    image: wurstmeister/kafka
-    container_name: kafka
-    ports:
-      - "9092:9092"
-      - "29092:29092"
-    expose:
-      - 9092
-      - 29092
-    environment:
-      KAFKA_ADVERTISED_HOST_NAME: kafka
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_LISTENERS: PLAINTEXT://:9092,PLAINTEXT_HOST://:29092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://192.168.100.14:29092
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_BROKER_ID: 1
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    depends_on:
-      - zookeeper
-    networks:
-      - tasktide
   calendarservices:
+    image: sha256:d80173beca2c267aa6e0620b890c7c9431eab12f5e76d64ea4c2225d8c12e735
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tasktide?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Stefpark77$
+    networks:
+      - tasktide
+    depends_on:
+      - mysql
+  taskservices:
+    image: sha256:d80173beca2c267aa6e0620b890c7c9431eab12f5e76d64ea4c2225d8c12e735
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tasktide?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Stefpark77$
+    networks:
+      - tasktide
+    depends_on:
+      - mysql
+  projectservices:
     image: sha256:d80173beca2c267aa6e0620b890c7c9431eab12f5e76d64ea4c2225d8c12e735
     restart: always
     ports:
@@ -75,13 +72,11 @@ services:
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     networks:
       - tasktide
     depends_on:
       - mysql
       - rabbitmq
-      - kafka
       - authservices
   authservices:
     image: sha256:4327b62fa4f1e23c6cb9dbc45d6ae7c38eea15efbd18dab8d56d1feb86b4f1a8
@@ -96,15 +91,11 @@ services:
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      BOOTSTRAP_SERVERS_CONFIG: kafka:9092
-      KAFKA_REST_HOST_NAME: authservices
     networks:
       - tasktide
     depends_on:
       - mysql
       - rabbitmq
-      - kafka
 networks:
   tasktide:
     driver:

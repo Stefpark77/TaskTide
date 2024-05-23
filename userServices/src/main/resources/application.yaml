@@ -11,19 +11,6 @@ spring:
     port: 5672
     username: guest
     password: guest
-  kafka:
-    consumer:
-      bootstrap-servers: 192.168.100.14:29092
-      group-id: userServices
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "*"
-    topic:
-      name:
-        logintest
-    bootstrap-servers: 192.168.100.14:29092
 rabbitmq:
   queue:
     name: signup
@@ -34,7 +21,7 @@ rabbitmq:
 server:
   servlet:
     context-path: /userServices
-  port: 8081
+  port: 9000
 
 security:
   jwt:

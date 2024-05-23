@@ -18,21 +18,18 @@ import java.util.UUID;
 public class Event {
 
     @Id
-    @Column(name = "id")
-    String id;
-    @Column(name = "event_name")
-    String name = "unnamed event";
-    @Column(name = "event_description")
-    String description = "no description";
-    @Column(name = "event_date")
-    Instant date = Instant.now();
-    Boolean everyYear = false;
-    Boolean everyMonth = false;
-    String userId;
-    @Column(name = "created_date")
-    Instant createdDate = Instant.now();
-    @Column(name = "updated_date")
-    Instant updatedDate = Instant.now();
+    private String id;
+    private Instant createdDate = Instant.now();
+    private Instant updatedDate = Instant.now();
+
+    private String name = "unnamed event";
+    @Column(length = 10000)
+    private String description = "no description";
+    private Instant date = Instant.now();
+    private Instant endDate = Instant.now();
+    @Enumerated(EnumType.STRING)
+    private RecurringTime recurringTime = RecurringTime.ONCE;
+    private String userId;
 
     @PrePersist
     private void ensureId() {

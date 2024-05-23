@@ -11,19 +11,6 @@ spring:
     port: 5672
     username: guest
     password: guest
-  kafka:
-    producer:
-      bootstrap-servers: 192.168.100.14:29092
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    topic:
-      name:
-        logintest
-    bootstrap-servers: 192.168.100.14:29092
-    admin:
-      properties:
-        bootstrap:
-          servers: ["192.168.100.14:29092"]
 server:
   servlet:
     context-path: /authServices

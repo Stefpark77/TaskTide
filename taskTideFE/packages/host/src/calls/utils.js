@@ -1,3 +1,5 @@
-export const calendarServicesURL = 'http://localhost:8081/calendarServices/';
-export const userServicesURL = 'http://localhost:8082/userServices/';
-export const authServicesURL = 'http://localhost:8083/authServices/';
+export const authServicesURL = 'http://localhost:8081/authServices/';
+export const userServicesURL = 'http://localhost:9000/userServices/';
+export const calendarServicesURL = 'http://localhost:9001/calendarServices/';
+export const taskServicesURL = 'http://localhost:9002/taskServices/';
+export const projectServicesURL = 'http://localhost:9003/projectServices/';
