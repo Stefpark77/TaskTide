@@ -5,6 +5,12 @@
         <button
             class="mt-5 mr-10 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl border-gray-50 border-2 focus:outline-none focus:shadow-outline"
             type="button"
+            v-on:click="smartSort">
+          Smart Sort
+        </button>
+        <button
+            class="mt-5 mr-10 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl border-gray-50 border-2 focus:outline-none focus:shadow-outline"
+            type="button"
             v-on:click="addTask">
           Add New Task?
         </button>
@@ -24,14 +30,17 @@
             <a><b>PRIORITY:</b> {{ task.priority }}</a>
             <a><b>DIFFICULTY:</b> {{ task.difficulty }}</a>
             <a><b>PROGRESS:</b> {{ task.progress }}%</a>
-            <a><b>PROJECT:</b> {{ task.projectId == undefined || task.projectId == null ? 'unassigned' : task.projectId}}</a>
           </div>
-          <div class="description_container">
+          <div class="description_container3">
             <div class="description">
               {{task.description.length > 255 ? task.description.slice(0, 255) + '...' : task.description }}
             </div>
           </div>
-          <div class="deadlines">
+
+          <div class="task_properties">
+            <a><b>PROJECT:</b> {{ task.projectId == null ? 'unassigned' : task.projectId}}</a>
+          </div>
+          <div class="deadlines" v-if="task.projectId !== null">
             <a class="deadline_text"><a class="text-red-500">DEADLINE:</a> {{ format(parseISO(task.deadline),"MMMM dd, yyyy")}}</a>
           </div>
         </div>
@@ -53,6 +62,10 @@ export default {
   methods: {
     parseISO,
     format,
+    smartSort() {
+      this.$store?.commit('fetchTasks', true);
+      this.tasks = this.$store?.state?.tasks;
+    },
     addTask() {
       this.$store?.commit('setShowAddTask', true);
       this.$store?.commit('setShowTasks', false);
@@ -100,10 +113,11 @@ export default {
   margin-bottom: 1%;
   font-size: x-large;
 }
-.description_container{
+.description_container3{
   display: flex;
   justify-content: space-evenly;
   margin-bottom: 1%;
+  min-height: 250px;
 }
 .description{
   font-size: large;
@@ -138,7 +152,7 @@ export default {
   margin-left: 150px; /* Adjust the margin between cards */
   border: 1px solid #ccc;
   border-radius: 25px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 8px 131px -20px rgba(0,0,0,0.45);
   padding: 20px;
   background-color: white;
   display: flex;

@@ -28,7 +28,9 @@ public class TaskService {
     public List<Task> getTasksByUserId(String userId) {
         return prioritizationSorter.sortByPrioritizationTasks(taskRepository.findTasksByUserId(userId));
     }
-
+    public List<Task> getTasksByProjectId(String projectId) {
+        return taskRepository.findTasksByProjectId(projectId);
+    }
     public List<Task> getAllTasks() {
         return taskRepository.findAllTasks();
     }

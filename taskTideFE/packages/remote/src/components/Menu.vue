@@ -8,39 +8,28 @@
         </div>
       </div>
       <div class="account_info">
-        <a>{{username}}</a>
-        <a>{{email}}</a>
+        <a>{{this.$store?.state?.currentUser.username}}</a>
+        <a>{{this.$store?.state?.currentUser.email}}</a>
       </div>
     </div>
     <div class="menu_buttons">
-      <div>
-        <button
-            class="menu_button"
-            type="button" @click="agenda">
-          O   Agenda
-        </button>
-      </div>
-      <div>
-        <button
-            class="menu_button"
-            type="button" @click="tasksPage">
-          O   Tasks
-        </button>
-      </div>
-      <div>
-        <button
-            class="menu_button"
-            type="button" @click="projectsPage">
-          O   Projects
-        </button>
-      </div>
+      <v-tabs
+          color="#1e90ff"
+          direction="vertical">
+        <v-tab class="menu_button" prepend-icon="mdi-calendar-clock" text="Agenda" value="Agenda" @click="agenda"></v-tab>
+        <v-tab class="menu_button" prepend-icon="mdi-file-tree" text="Projects" value="Projects" @click="projectsPage"></v-tab>
+        <v-tab class="menu_button" prepend-icon="mdi-bulletin-board" text="Tasks" value="Tasks" @click="tasksPage"></v-tab>
+      </v-tabs>
     </div>
     <div class="logout_button">
-      <button
+      <v-btn
+          rounded="xl"
+          size="x-large"
+          color="#1e90ff"
           class="standard_button"
-          type="button" @click="logout">
-        Log Out
-      </button>
+          variant="flat" @click="logout">
+        SIGN OUT
+      </v-btn>
     </div>
   </div>
   <div class="title">
@@ -69,8 +58,10 @@ export default {
       this.$store?.commit('setShowEditEvent', false);
       this.$store?.commit('setShowAddTask', false);
       this.$store?.commit('setShowEditTask', false);
+      this.$store?.commit('setShowTaskPage', false);
       this.$store?.commit('setShowAddProject', false);
       this.$store?.commit('setShowEditProject', false);
+      this.$store?.commit('setShowProjectPage', false);
     },
     tasksPage() {
       this.$store?.commit('setShowEvents', false);
@@ -80,8 +71,10 @@ export default {
       this.$store?.commit('setShowEditEvent', false);
       this.$store?.commit('setShowAddTask', false);
       this.$store?.commit('setShowEditTask', false);
+      this.$store?.commit('setShowTaskPage', false);
       this.$store?.commit('setShowAddProject', false);
       this.$store?.commit('setShowEditProject', false);
+      this.$store?.commit('setShowProjectPage', false);
     },
     projectsPage() {
       this.$store?.commit('setShowEvents', false);
@@ -91,8 +84,10 @@ export default {
       this.$store?.commit('setShowEditEvent', false);
       this.$store?.commit('setShowAddTask', false);
       this.$store?.commit('setShowEditTask', false);
+      this.$store?.commit('setShowTaskPage', false);
       this.$store?.commit('setShowAddProject', false);
       this.$store?.commit('setShowEditProject', false);
+      this.$store?.commit('setShowProjectPage', false);
     },
     logout() {
       this.$store?.commit('logout');
@@ -109,12 +104,13 @@ export default {
   bottom: 0;
   position: absolute;
   background-repeat: repeat;
-  border-right: 3px solid gray;
   background-color: white;
   display: flex;
   align-content: stretch;
   flex-direction: column;
   justify-content: space-between;
+  box-shadow: 4px 40px 80px rgba(0, 0, 0, 0.1);
+  z-index: 200;
 }
 .title {
   width: 85%;
@@ -130,6 +126,7 @@ export default {
   justify-content: flex-end;
   border-bottom: 3px solid gray;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 201;
 }
 .title_text {
   margin-right: 75px;

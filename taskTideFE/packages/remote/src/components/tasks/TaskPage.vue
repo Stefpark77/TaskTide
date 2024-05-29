@@ -15,12 +15,12 @@
             {{ task.description }}
           </div>
         </div>
-        <a><b>PROJECT:</b> {{ task.projectId === undefined || task.projectId == null ? 'unassigned' : task.projectId }}
-          <a class="deadline_text" v-if="!task.projectId === undefined && !task.projectId == null"><a
-              class="text-red-500">DEADLINE:</a> {{ format(parseISO(task.deadline), "MMMM dd, yyyy") }}</a>
+        <a><b>PROJECT:</b> {{  task.projectId == null ? 'unassigned' : task.projectId }}
+          <a class="deadline_text" v-if="task.projectId !== null">   (<a
+              class="text-red-500">DEADLINE:</a> {{ format(parseISO(task.deadline), "MMMM dd, yyyy") }})   </a>
         </a>
         <div class="task_properties">
-          <a class="font-bold " v-if="taskDependencies !== []">Depends on:</a>
+          <a class="font-bold ">Depends on:</a>
           <table class="table-auto w-full content-center">
             <tbody class="text-center">
             <tr v-for="taskDependency in this.$store?.state?.taskDependencies" :key="taskDependency.id">
@@ -46,18 +46,19 @@
               <td class="border px-4 py-2">
                 <select
                     class="resize-y overflow-auto shadow appearance-none border rounded w-full py-3 px-4 text-lg text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="description"  v-model="addPriority">
-<!--                  <option v-for="otherTask in this.$store?.state?.tasks"
+                    id="description"  v-model="toAddDependency">
+                  <option v-for="otherTask in addableDependencies"
                           :key="otherTask.id"
-                          v-if="!taskDependenciesIds.includes(otherTask) && !taskDependenciesOnIds.includes(otherTask) && otherTask.id !== task.id">
+                          :value="otherTask.id">
                     {{ otherTask.name + ' ' + '(Stage: ' + otherTask.stage + ' | Priority: ' + otherTask.priority + ')'}}
-                  </option>-->
+                  </option>
                 </select>
               </td>
-              <td class="border px-4 py-2">
+              <td class="border px-4 py-2"
+                  v-if="toAddDependency !== undefined && toAddDependency !== '' && toAddDependency !== null">
                 <button
-                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                    type="button" @click="">
+                    class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+                    type="button" @click="addTaskDependency(task.id, toAddDependency)">
                   Add New Dependency?
                 </button>
               </td>
@@ -65,7 +66,7 @@
             </tbody>
           </table>
 
-          <a class="font-bold " v-if="taskDependenciesOn !== []">Is depended by:</a>
+          <a class="font-bold ">Is depended by:</a>
           <table class="table-auto w-full content-center">
             <tbody class="text-center">
             <tr v-for="taskDependency in this.$store?.state?.taskDependenciesOn" :key="taskDependency.id">
@@ -84,6 +85,27 @@
                     class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
                     type="button" @click="openTask(taskDependency)">
                   ...
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td class="border px-4 py-2">
+                <select
+                    class="resize-y overflow-auto shadow appearance-none border rounded w-full py-3 px-4 text-lg text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    id="description"  v-model="toAddDependencyOn">
+                  <option v-for="otherTask in addableDependencies"
+                          :key="otherTask.id"
+                          :value="otherTask.id">
+                    {{ otherTask.name + ' ' + '(Stage: ' + otherTask.stage + ' | Priority: ' + otherTask.priority + ')'}}
+                  </option>
+                </select>
+              </td>
+              <td class="border px-4 py-2"
+                  v-if="toAddDependencyOn !== undefined && toAddDependencyOn !== '' && toAddDependencyOn !== null">
+                <button
+                    class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+                    type="button" @click="addTaskDependency(toAddDependencyOn, task.id)">
+                  Add New Dependency?
                 </button>
               </td>
             </tr>
@@ -116,6 +138,13 @@
 <script>
 import {format, parseISO} from "date-fns";
 export default {
+  computed:{
+    addableDependencies: function () {
+      return this.$store?.state?.tasks.filter(otherTask => !this.$store?.state?.taskDependencies.map(task => task.id).includes(otherTask.id)
+          && !this.$store?.state?.taskDependenciesOn.map(task => task.id).includes(otherTask.id)
+          && otherTask.id !== this.task.id )
+    },
+  },
   data() {
     return {
       task: this.$store?.state?.task ?? '',
@@ -123,8 +152,8 @@ export default {
       tasks: this.$store?.state?.tasks ?? [],
       taskDependencies: this.$store?.state?.taskDependencies ?? [],
       taskDependenciesOn: this.$store?.state?.taskDependenciesOn ?? [],
-      /*taskDependenciesIds: this.$store?.state?.taskDependencies.map(task => task.id),
-      taskDependenciesOnIds: this.$store?.state?.taskDependenciesOn.map(task => task.id)*/
+      toAddDependency: '',
+      toAddDependencyOn: '',
     };
   },
   watch: {},
@@ -138,26 +167,28 @@ export default {
     exitTask() {
       this.$store?.commit('setShowTaskPage', false);
       this.$store?.commit('setShowTasks', true);
+      this.$store?.commit('fetchTasks', true);
     },
     removeTask(id) {
       this.$store?.commit('removeTask', id);
-      this.$store?.commit('setShowEditTask', false);
+      this.$store?.commit('setShowTaskPage', false);
       this.$store?.commit('setShowTasks', true);
     },
     removeTaskDependency(id, dependsOnId) {
-      this.$store?.commit('removeTaskDependency', id, dependsOnId);
-      this.$store?.commit('fetchTaskDependenciesByTaskId', false);
-      this.$store?.commit('fetchTaskDependenciesByDependsOnId', false);
+      this.$store?.commit('removeTaskDependency', {taskId: id, dependsOnId: dependsOnId});
+    },
+    addTaskDependency(id, dependsOnId) {
+      this.$store?.commit('createTaskDependency', {taskId: id, dependsOnId: dependsOnId});
+      this.$store?.commit('fetchTaskDependenciesByDependsOnId', this.task.id);
+      this.$store?.commit('fetchTaskDependenciesByTaskId', this.task.id);
     },
     openTask(task) {
       this.$store?.commit('setTaskPage', task);
       this.$store?.commit('fetchTaskDependenciesByDependsOnId', task.id);
       this.$store?.commit('fetchTaskDependenciesByTaskId', task.id);
-      this.task= this.$store?.state?.task ?? '';
+      this.task = this.$store?.state?.task ?? '';
       this.taskDependencies = this.$store?.state?.taskDependencies ?? [];
       this.taskDependenciesOn = this.$store?.state?.taskDependenciesOn ?? [];
-     /* this.taskDependenciesIds = this.taskDependencies.map(task => task.id);
-      this.taskDependenciesOnIds = this.taskDependenciesOn.map(task => task.id);*/
     },
   },
 };
@@ -183,7 +214,7 @@ export default {
 .taskPage1st {
   background-color: white;
   width: 70%;
-  height: 70%;
+  min-height: 70%;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adjust this value to match Tailwind's shadow-md */
   border-radius: 1.5rem; /* equivalent to rounded-3xl */
   padding-left: 2rem; /* equivalent to px-8 */
@@ -213,7 +244,7 @@ export default {
   justify-content: space-evenly;
   margin-bottom: 1%;
   min-width: 90%;
-  min-height: 60%;
+  min-height: 50%;
   padding: 10px;
 }
 

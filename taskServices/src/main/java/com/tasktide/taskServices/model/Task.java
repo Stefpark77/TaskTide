@@ -27,7 +27,7 @@ public class Task {
     private String description = "no description";
     private Integer progress = 0;
     private Integer difficulty = 0;
-    private Instant deadline = Instant.now();
+    private Instant deadline = null;
 
     @Enumerated(EnumType.STRING)
     private Priority priority = Priority.MEDIUM;

@@ -17,7 +17,7 @@ import {
     getUserByUsername,
     createUser,
     deleteUser,
-    updateUser
+    updateUser, getUserByProjectId
 } from "./calls/userServicesCalls";
 import {
     getAllTasks,
@@ -29,7 +29,7 @@ import {
     getTaskDependencyByTaskId,
     getTaskDependencyByDependsOnId,
     createTaskDependency,
-    deleteTaskDependency,
+    deleteTaskDependency, getTaskByProjectId,
 } from "./calls/taskServicesCalls";
 import {
     getAllProjects,
@@ -37,17 +37,17 @@ import {
     getProjectByUserId,
     createProject,
     deleteProject,
-    updateProject
+    updateProject, createProjectUser, deleteProjectUser
 } from "./calls/projectServicesCalls";
 
 import "./index.scss";
-
 import App from "./App.vue";
 
 import LoginPage from "./views/LoginPage.vue";
 import MenuPage from "./views/MenuPage.vue";
 
 import {format, parseISO} from 'date-fns';
+import {getEstimatedDifficulty} from "./calls/difficultyEstimatorCalls";
 
 const routes = [
     {path: "/", component: LoginPage},
@@ -78,6 +78,7 @@ const store = createStore({
             addLastName: '',
             addUsername: '',
             addPassword: '',
+            addCPassword: '',
             addEmail: '',
             token: '',
             /*calendar services*/
@@ -85,14 +86,14 @@ const store = createStore({
             showEvents: false,
             showAddEvent: false,
             showEditEvent: false,
-                /*Add Event*/
+            /*Add Event*/
             addName: '',
             addDescription: '',
             addDate: '',
             addDateTime: '',
             addEndDate: '',
             addEndDateTime: '',
-                /*Edit Event*/
+            /*Edit Event*/
             editEventId: '',
             updateName: '',
             updateDescription: '',
@@ -102,11 +103,12 @@ const store = createStore({
             updateEndDateTime: '',
             /*task services*/
             tasks: [],
+            allTasks: [],
             showTasks: false,
             showAddTask: false,
             showEditTask: false,
             showTaskPage: false,
-                /*Add/Edit Task*/
+            /*Add/Edit Task*/
             editTaskId: '',
             addDifficulty: '',
             addPriority: '',
@@ -126,11 +128,15 @@ const store = createStore({
             showAddProject: false,
             showEditProject: false,
             showProjectPage: false,
-                /*Add/Edit Project*/
+            /*Add/Edit Project*/
             editProjectId: '',
             addDeadline: '',
             updateDeadline: '',
             /*Project Page*/
+            project: '',
+            projectTasks: [],
+            projectUsers: [],
+            currentUser: '',
         };
     },
     mutations: {
@@ -139,7 +145,6 @@ const store = createStore({
             try {
                 const response = await login({username: state.username, password: state.password});
 
-                window.location.href = '/tasktide';
                 if (response.status !== 200 || response.data === '') throw new Error('Failed to login');
                 state.loginError = false;
                 localStorage.setItem("username", response.data.username)
@@ -154,6 +159,8 @@ const store = createStore({
         },
         async signUp(state, user) {
             try {
+                if(user.cPassword !== user.password) throw new Error('The Password fields must match!');
+                delete user.cPassword;
                 const response = await signUp(user);
 
                 if (response.status !== 200) throw new Error('Failed to sign up user');
@@ -166,6 +173,7 @@ const store = createStore({
             state.addLastName = '';
             state.addUsername = '';
             state.addPassword = '';
+            state.addCPassword = '';
             state.addEmail = '';
             state.showSignUp = false;
         },
@@ -181,8 +189,18 @@ const store = createStore({
             }
         },
         async prepareMenu(state) {
-            state.username = await localStorage.getItem("username");
-            state.email = await localStorage.getItem("email");
+            try {
+                const response = await getUserByUserId(localStorage.getItem("userId"), localStorage.getItem("token"));
+
+                checkAuth(response);
+
+                if (response.status !== 200) throw new Error('Failed to get current user');
+
+                state.currentUser = response.data;
+            } catch (error) {
+                console.error(error);
+            }
+
         },
 
         /*Calendar Services*/
@@ -255,10 +273,10 @@ const store = createStore({
             state.editEventId = event.id;
             state.updateName = event.name;
             state.updateDescription = event.description;
-            state.updateDate = format(parseISO(event.date),"yyyy-MM-dd");
-            state.updateDateTime = format(parseISO(event.date),"HH:mm");
-            state.updateEndDate =format( parseISO(event.endDate),"yyyy-MM-dd");
-            state.updateEndDateTime = format( parseISO(event.endDate),"HH:mm");
+            state.updateDate = format(parseISO(event.date), "yyyy-MM-dd");
+            state.updateDateTime = format(parseISO(event.date), "HH:mm");
+            state.updateEndDate = format(parseISO(event.endDate), "yyyy-MM-dd");
+            state.updateEndDateTime = format(parseISO(event.endDate), "HH:mm");
 
         },
         async updateEvent(state, event) {
@@ -296,6 +314,20 @@ const store = createStore({
         },
 
         /*Task Services*/
+
+        async fetchAllTasks(state) {
+            try {
+                const response = await getAllTasks(localStorage.getItem("token"));
+
+                checkAuth(response);
+
+                if (response.status !== 200) throw new Error('Failed to get tasks');
+
+                state.allTasks = response.data;
+            } catch (error) {
+                console.error(error);
+            }
+        },
         async fetchTasks(state) {
             try {
                 const response = await getTaskByUserId(localStorage.getItem("userId"), localStorage.getItem("token"));
@@ -309,7 +341,7 @@ const store = createStore({
                 console.error(error);
             }
         },
-        async fetchTaskByTaskId(taskId, state) {
+        async fetchTaskByTaskId(state, taskId) {
             try {
                 const response = await getTaskByTaskId(localStorage.getItem("taskId"), localStorage.getItem("token"));
 
@@ -318,6 +350,19 @@ const store = createStore({
                 if (response.status !== 200) throw new Error('Failed to get task by taskId');
 
                 return response.data;
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        async fetchTaskByProjectId(state, projectId) {
+            try {
+                const response = await getTaskByProjectId(projectId, localStorage.getItem("token"));
+
+                checkAuth(response);
+
+                if (response.status !== 200) throw new Error('Failed to get task by projectId');
+
+                state.projectTasks = response.data;
             } catch (error) {
                 console.error(error);
             }
@@ -374,6 +419,7 @@ const store = createStore({
             try {
                 console.log(task);
                 task.id = state.editTaskId;
+                task.projectId = state.task.projectId;
 
                 const response = await updateTask(task, localStorage.getItem("token"));
 
@@ -415,36 +461,66 @@ const store = createStore({
 
                 if (response.status !== 200) throw new Error('Failed to get task dependencies');
 
-                console.log(dependsOnId);
-                console.log(response.data);
                 state.taskDependenciesOn = response.data;
                 console.log(state.taskDependenciesOn);
             } catch (error) {
                 console.error(error);
             }
         },
-        async removeTaskDependency(state, taskId, dependsOnId) {
+        async removeTaskDependency(state, dependency) {
             try {
-                const response = await deleteTaskDependency(taskId, dependsOnId, localStorage.getItem("token"));
+                const response = await deleteTaskDependency(dependency.taskId, dependency.dependsOnId, localStorage.getItem("token"));
 
                 checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to delete task dependency');
 
-                state.tasks = state.tasks.filter(task => task.id !== taskId);
+                const response2 = await getTaskDependencyByDependsOnId(state.task.id, localStorage.getItem("token"));
+                checkAuth(response2);
+                if (response2.status !== 200) throw new Error('Failed to get task dependencies');
+                state.taskDependenciesOn = response2.data;
+
+                const response3 = await getTaskDependencyByTaskId(state.task.id, localStorage.getItem("token"));
+                checkAuth(response3);
+                if (response3.status !== 200) throw new Error('Failed to get task dependencies');
+                state.taskDependencies = response3.data;
+
             } catch (error) {
                 console.error(error);
             }
         },
-        async createTaskDependency(state, taskId, dependsOnId) {
+        async createTaskDependency(state, dependency) {
             try {
-                const response = await createTaskDependency(taskId, dependsOnId, localStorage.getItem("token"));
+                const response = await createTaskDependency(dependency, localStorage.getItem("token"));
 
                 checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to create task dependency');
 
-                state.tasks.push(response.data);
+                const response2 = await getTaskDependencyByDependsOnId(state.task.id, localStorage.getItem("token"));
+                checkAuth(response2);
+                if (response2.status !== 200) throw new Error('Failed to get task dependencies');
+                state.taskDependenciesOn = response2.data;
+
+                const response3 = await getTaskDependencyByTaskId(state.task.id, localStorage.getItem("token"));
+                checkAuth(response3);
+                if (response3.status !== 200) throw new Error('Failed to get task dependencies');
+                state.taskDependencies = response3.data;
+            } catch (error) {
+                console.error(error);
+            }
+        },
+
+        async estimateDifficulty(state, description) {
+            try {
+                const response = await getEstimatedDifficulty(description, localStorage.getItem("token"));
+
+                checkAuth(response);
+
+                if (response.status !== 200) throw new Error('Failed to create task dependency');
+
+                console.log(response.data)
+                state.addDifficulty = response.data.difficulty;
             } catch (error) {
                 console.error(error);
             }
@@ -504,7 +580,7 @@ const store = createStore({
             state.editProjectId = project.id;
             state.updateName = project.name;
             state.updateDescription = project.description;
-            state.updateDeadline = format(parseISO(project.deadline),"yyyy-MM-dd");
+            state.updateDeadline = format(parseISO(project.deadline), "yyyy-MM-dd");
 
         },
         async updateProject(state, project) {
@@ -528,7 +604,79 @@ const store = createStore({
                 console.error(error);
             }
         },
+        setProjectPage(state, project) {
+            state.showProjectPage = true;
+            state.project = project;
+        },
+        async updateTaskForProject(state, taskAndProject) {
+            try {
+                taskAndProject.task.projectId = taskAndProject.project.id;
+                taskAndProject.task.deadline = taskAndProject.project.deadline;
+                console.log(taskAndProject.task);
+                const response = await updateTask(taskAndProject.task, localStorage.getItem("token"));
 
+                checkAuth(response);
+
+                if (response.status !== 200) throw new Error('Failed to update task');
+
+                const response2 = await getTaskByProjectId(state.project.id, localStorage.getItem("token"));
+                checkAuth(response2);
+                if (response2.status !== 200) throw new Error('Failed to get tasks by projectId');
+                state.projectTasks = response2.data;
+
+
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        async fetchUsersForProject(state, projectId) {
+            try {
+                const response = await getUserByProjectId(projectId, localStorage.getItem("token"));
+
+                checkAuth(response);
+
+                if (response.status !== 200) throw new Error('Failed to get users by projectId');
+
+                state.projectUsers = response.data;
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        async removeProjectUser(state, projectUser) {
+            try {
+                const response = await deleteProjectUser(projectUser.projectId, state.currentUser.id, localStorage.getItem("token"));
+
+                checkAuth(response);
+
+                if (response.status !== 200) throw new Error('Failed to delete project user connection');
+
+                const response2 = await getUserByProjectId(projectUser.projectId, localStorage.getItem("token"));
+                checkAuth(response2);
+                if (response2.status !== 200) throw new Error('Failed to get project users');
+                state.projectUsers = response2.data;
+
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        async createProjectUser(state, projectUser) {
+            try {
+                projectUser.userId = state.currentUser.id;
+                const response = await createProjectUser(projectUser, localStorage.getItem("token"));
+
+                checkAuth(response);
+
+                if (response.status !== 200) throw new Error('Failed to create project user connection');
+
+                const response2 = await getUserByProjectId(projectUser.projectId, localStorage.getItem("token"));
+                checkAuth(response2);
+                if (response2.status !== 200) throw new Error('Failed to get project users');
+                state.projectUsers = response2.data;
+
+            } catch (error) {
+                console.error(error);
+            }
+        },
 
         /*setters*/
         setUsername(state, username) {
@@ -616,6 +764,9 @@ const store = createStore({
         setAddPassword(state, addPassword) {
             state.addPassword = addPassword;
         },
+        setAddCPassword(state, addCPassword) {
+            state.addCPassword = addCPassword;
+        },
         setAddEmail(state, addEmail) {
             state.addEmail = addEmail;
         },
@@ -653,4 +804,26 @@ const store = createStore({
     },
 });
 
-createApp(App).use(router).use(store).mount("#app");
+import { createVuetify } from 'vuetify';
+import 'vuetify/dist/vuetify.min.css'; // Make sure this line is here to import Vuetify styles
+import './index.scss'; // Ensure this line is here to import your custom styles
+import 'vuetify/styles'; // Vuetify 3 specific import
+import "@mdi/font/css/materialdesignicons.css";
+import { aliases, mdi } from "vuetify/lib/iconsets/mdi.mjs";
+import {components, directives} from "vuetify/dist/vuetify";
+const vuetify = createVuetify({
+    components,
+    directives,
+    icons: {
+        defaultSet: "mdi",
+        aliases,
+        sets: {
+            mdi,
+        },
+    },
+});
+const app = createApp(App);
+app.use(router);
+app.use(store);
+app.use(vuetify);
+app.mount('#app');

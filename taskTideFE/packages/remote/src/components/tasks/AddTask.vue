@@ -8,9 +8,9 @@
                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 id="name" type="text" placeholder="Name" v-model="addName"/>
           </div>
-          <div class="mb-6">
+          <div class="description_container">
             <input
-                class="resize-y overflow-auto shadow appearance-none border rounded w-full py-3 px-4 text-lg text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                class="description"
                 id="description" type="text" placeholder="Description" v-model="addDescription"/>
           </div>
           <div class="mb-6">
@@ -29,6 +29,12 @@
             </select>
           </div>
           <div class="flex items-end">
+
+            <button
+                class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+                type="button" @click="estimateDifficulty">
+              Estimate Difficulty
+            </button>
             <button
                 class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
                 type="button" @click="addTask">
@@ -83,6 +89,10 @@ export default {
     },
   },
   methods: {
+    estimateDifficulty() {
+      this.$store?.commit('estimateDifficulty', {text: this.addDescription});
+      this.addDifficulty = this.$store?.state?.addDifficulty ?? '';
+    },
     addTask() {
       this.$store?.commit('createTask', {name: this.addName, description: this.addDescription, difficulty: this.addDifficulty, priority: this.addPriority});
       this.$store?.commit('setShowAddTask', false);
@@ -112,4 +122,17 @@ export default {
   color: black;
 }
 
+.description{
+  font-size: large;
+  display: flex;
+  justify-content: space-evenly;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 85%;
+  height: 94%;
+  padding: 20px;
+
+  margin-bottom: 1%;
+}
 </style>

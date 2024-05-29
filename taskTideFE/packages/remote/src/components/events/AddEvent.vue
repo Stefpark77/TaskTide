@@ -9,9 +9,9 @@
                 id="name" type="text" placeholder="Name" v-model="addName"/>
           </div>
           <div class="mb-6">
-            <input
+            <v-textarea
                 class="resize-y overflow-auto shadow appearance-none border rounded w-full py-3 px-4 text-lg text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="description" type="text" placeholder="Description" v-model="addDescription"/>
+                id="description" type="text" placeholder="Description" v-model="addDescription" :disabled="addName==='disabled'" />
           </div>
           <div class="mb-6">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="date">
@@ -34,6 +34,10 @@
                    type="time" id="endDateTime" placeholder="endDateTime"  v-model="addEndDateTime"/>
           </div>
           <div class="flex items-end">
+
+            <v-col cols="auto">
+              <v-btn icon="mdi-plus-circle-multiple-outline" size="x-large"></v-btn>
+            </v-col>
             <button
                 class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
                 type="button" @click="addEvent">

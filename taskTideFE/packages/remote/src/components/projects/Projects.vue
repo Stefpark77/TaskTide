@@ -15,7 +15,7 @@
             <a class="font-bold ">{{ project.name }}</a>
             <button
                 class="bg-white hover:bg-blue-700 text-black  hover:text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                type="button" @click="updateProject(project)">
+                type="button" @click="openProject(project)">
               ...
             </button>
           </div>
@@ -49,9 +49,12 @@ export default {
       this.$store?.commit('setShowAddProject', true);
       this.$store?.commit('setShowProjects', false);
     },
-    updateProject(project) {
-      this.$store?.commit('setUpdateProject', project);
+    openProject(project) {
+      this.$store?.commit('setProjectPage', project);
       this.$store?.commit('setShowProjects', false);
+      this.$store?.commit('fetchTaskByProjectId', project.id);
+      this.$store?.commit('fetchUsersForProject', project.id);
+      this.$store?.commit('fetchAllTasks', true);
     },
   },
 };
@@ -85,6 +88,7 @@ export default {
   display: flex;
   justify-content: space-evenly;
   margin-bottom: 1%;
+  min-height: 70%;
 }
 .description{
   font-size: large;
@@ -94,9 +98,10 @@ export default {
   border-radius: 25px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 85%;
-  height: 94%;
+  min-height: 94%;
   padding: 20px;
   margin-bottom: 1%;
+  overflow: auto; /* Add scrollbar when needed */
 }
 .projects {
   width: 100%;
@@ -112,7 +117,7 @@ export default {
 }
 .project {
   width: 400px; /* Adjust the width of your card */
-  height: 300px; /* Adjust the height of your card */
+  height: 500px; /* Adjust the height of your card */
   margin-right: 150px; /* Adjust the margin between cards */
   margin-left: 150px; /* Adjust the margin between cards */
   border: 1px solid #ccc;

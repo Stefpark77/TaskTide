@@ -31,6 +31,9 @@ public class UserRepository {
     public List<User> findAllUsers() {
         return (List<User>) iUserRepository.findAll();
     }
+    public List<User> findUserByProjectId(String projectId) {
+        return iUserRepository.findUsersByProjectId(projectId);
+    }
     public User createUser(User user) {
         return iUserRepository.save(user);
     }

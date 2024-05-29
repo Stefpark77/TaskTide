@@ -1,22 +1,22 @@
-import { userServicesURL } from "./utils";
+import {userServicesURL} from "./utils";
 import axios from "axios";
 
 export const getAllUsers = async () => {
     try {
-        const response = await axios.get(userServicesURL + 'user');
-
-        return response;
+        return await axios.get(userServicesURL + 'user');
     }
     catch (error) {
         console.error(error);
     }
 }
 
-export const getUserByUserId = async (userId) => {
+export const getUserByUserId = async (userId, token) => {
     try {
-        const response = await axios.get(userServicesURL + 'user/'+`${userId}`);
-
-        return response;
+        return await axios.get(userServicesURL + 'user/public/' + `${userId}`, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
     }
     catch (error) {
         console.error(error);
@@ -25,9 +25,19 @@ export const getUserByUserId = async (userId) => {
 
 export const getUserByUsername = async (username) => {
     try {
-        const response = await axios.get(userServicesURL + 'user/username/'+`${username}`);
-
-        return response;
+        return await axios.get(userServicesURL + 'user/public/username' + `${username}`);
+    }
+    catch (error) {
+        console.error(error);
+    }
+}
+export const getUserByProjectId = async (projectId, token) => {
+    try {
+        return await axios.get(userServicesURL + 'user/public/projectId/' + `${projectId}`, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
     }
     catch (error) {
         console.error(error);
@@ -35,9 +45,7 @@ export const getUserByUsername = async (username) => {
 }
 export const deleteUser = (userId) => {
     try {
-        const response = axios.delete(userServicesURL + 'user/'+`${userId}`);
-
-        return response;
+        return axios.delete(userServicesURL + 'user/' + `${userId}`);
     }
     catch (error) {
         console.error(error);
@@ -46,9 +54,7 @@ export const deleteUser = (userId) => {
 
 export const createUser = (user) => {
     try {
-        const response = axios.post(userServicesURL + 'user', user);
-
-        return response;
+        return axios.post(userServicesURL + 'user', user);
     }
     catch (error) {
         console.error(error);
@@ -57,9 +63,7 @@ export const createUser = (user) => {
 
 export const updateUser = (user) => {
     try {
-        const response = axios.put(userServicesURL + 'user', user);
-
-        return response;
+        return axios.put(userServicesURL + 'user', user);
     }
     catch (error) {
         console.error(error);

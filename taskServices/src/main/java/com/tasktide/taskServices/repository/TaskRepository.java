@@ -30,7 +30,9 @@ public class TaskRepository {
     public List<Task> findTasksByUserId(String userId) {
         return (List<Task>) iTaskRepository.findTasksByUserIdContains(userId);
     }
-
+    public List<Task> findTasksByProjectId(String projectId) {
+        return (List<Task>) iTaskRepository.findTasksByProjectIdContains(projectId);
+    }
     public List<Task> findAllTasks() {
         return (List<Task>) iTaskRepository.findAll();
     }
@@ -48,16 +50,14 @@ public class TaskRepository {
             newTask.setProgress(task.getProgress());
         if(task.getDifficulty() != null)
             newTask.setDifficulty(task.getDifficulty());
-        if(task.getDeadline() != null)
-            newTask.setDeadline(task.getDeadline());
+        newTask.setDeadline(task.getDeadline());
         if(task.getPriority() != null)
             newTask.setPriority(task.getPriority());
         if(task.getStage() != null)
             newTask.setStage(task.getStage());
         if(task.getUserId() != null)
             newTask.setUserId(task.getUserId());
-        if(task.getProjectId() != null)
-            newTask.setProjectId(task.getProjectId());
+        newTask.setProjectId(task.getProjectId());
         newTask.setUpdatedDate(Instant.now());
         iTaskRepository.save(newTask);
         return newTask;

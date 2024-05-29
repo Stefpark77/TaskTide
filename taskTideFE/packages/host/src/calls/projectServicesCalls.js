@@ -83,3 +83,29 @@ export const updateProject = (project, token) => {
         console.error(error);
     }
 }
+
+export const deleteProjectUser = (projectId, userId, token) => {
+    try {
+        return axios.delete(projectServicesURL + 'project-user/?projectId=' + projectId + '&userId=' + userId, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+    }
+    catch (error) {
+        console.error(error);
+    }
+}
+
+export const createProjectUser = (projectUser, token) => {
+    try {
+        return axios.post(projectServicesURL + 'project-user/', projectUser, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+    }
+    catch (error) {
+        console.error(error);
+    }
+}

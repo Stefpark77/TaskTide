@@ -34,7 +34,7 @@
 
         <div class="space">
           <input class="login_signup_input"
-                 id="password" type="password" placeholder="Confirm Password" v-model="addPassword"/>
+                 id="password" type="password" placeholder="Confirm Password" v-model="addCPassword"/>
         </div>
 
         <div class="big_space">
@@ -43,10 +43,15 @@
           </div>
         </div>
         <div class="placement_center">
-          <button class="standard_button"
-                  type="button" @click="signUp">
+          <v-btn
+              rounded="xl"
+              size="x-large"
+              color="#1e90ff"
+              class="standard_button"
+              variant="flat"
+              @click="signUp">
             CREATE ACCOUNT
-          </button>
+          </v-btn>
         </div>
       </div>
     </div>
@@ -61,6 +66,7 @@ export default {
       addLastName: this.$store?.state?.addLastName ?? '',
       addUsername: this.$store?.state?.addUsername ?? '',
       addPassword: this.$store?.state?.addPassword ?? '',
+      addCPassword: this.$store?.state?.addCPassword ?? '',
       addEmail: this.$store?.state?.addEmail ?? '',
     };
   },
@@ -89,6 +95,12 @@ export default {
       },
       deep: true,
     },
+    addCPassword: {
+      handler: function (val) {
+        this.$store?.commit('setAddCPassword', val);
+      },
+      deep: true,
+    },
     addEmail: {
       handler: function (val) {
         this.$store?.commit('setAddEmail', val);
@@ -103,6 +115,7 @@ export default {
         lastName: this.addLastName,
         username: this.addUsername,
         password: this.addPassword,
+        cPassword: this.addCPassword,
         email: this.addEmail
       });
       this.$store?.commit('setShowSignUp', true);

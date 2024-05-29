@@ -26,9 +26,15 @@
             </div>
           </div>
           <div class="placement_center">
-            <button class="standard_button" type="button" @click="login">
+            <v-btn
+                rounded="xl"
+                size="x-large"
+                color="#1e90ff"
+                class="standard_button"
+                variant="flat"
+                @click="login">
               LOGIN
-            </button>
+            </v-btn>
           </div>
           <div class="error" v-if="this.$store?.state?.loginError">
             Invalid Username or Password
