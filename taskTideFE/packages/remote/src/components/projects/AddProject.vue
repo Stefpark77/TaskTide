@@ -1,38 +1,35 @@
 <template>
   <div v-if="this.$store?.state?.showAddProject">
     <div class="zoneAddProject">
-      <div class="w-full max-w-xs mx-auto">
-        <div class="bg-white shadow-md rounded-3xl px-8 pt-6 pb-8 mb-4">
-          <div class="mb-4 mt-4">
-            <input
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="name" type="text" placeholder="Name" v-model="addName"/>
-          </div>
-          <div class="mb-6">
-            <input
-                class="resize-y overflow-auto shadow appearance-none border rounded w-full py-3 px-4 text-lg text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="description" type="text" placeholder="Description" v-model="addDescription"/>
-          </div>
-          <div class="mb-6">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="deadline">
-              Deadline:
-            </label>
-            <input
-                class="mb-6 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="deadline" type="date" placeholder="Date" v-model="addDeadline"/>
-          </div>
-          <div class="flex items-end">
-            <button
+      <div class="w-full max-w-xs mx-auto flex justify-center">
+        <div class="bg-white shadow-md rounded-3xl px-8 pt-6 pb-8 mb-4 flex beautifulShadow">
+        <div class="mr-6">
+          <v-text-field
+              hide-details="auto"
+              class="mb-5"
+              label="Name"
+              v-model="addName"
+          ></v-text-field>
+          <v-textarea id="description" rows="10" min-width="500px" type="text" placeholder="Description" v-model="addDescription" />
+
+          <v-text-field type="date"
+                        label = "Deadline"
+                        v-model="addDeadline"
+          ></v-text-field>
+
+          <div class="flex items-end justify-end">
+            <v-btn
+                class="mr-5"
+                type="button" @click="cancelAdd">
+              Cancel
+            </v-btn>
+            <v-btn
                 class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
                 type="button" @click="addProject">
               Add Project
-            </button>
-            <button
-                class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                type="button" @click="cancelAdd">
-              Cancel
-            </button>
+            </v-btn>
           </div>
+        </div>
         </div>
       </div>
     </div>

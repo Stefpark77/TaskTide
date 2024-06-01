@@ -23,7 +23,7 @@ public class PrioritizationSorter {
             .thenComparing(EstimatedDeadlineTask::getDifficulty)
             .thenComparing(EstimatedDeadlineTask::getName);
 
-    public  List<Task> sortByPrioritizationTasks(List<Task> tasks) {
+    public List<Task> sortByPrioritizationTasks(List<Task> tasks) {
 
         //get dependencies
         Map<String, List<String>> dependencyMap = getDependencyMap(tasks);
@@ -127,9 +127,12 @@ public class PrioritizationSorter {
             updateEstimatedDeadlineForTask(dependency, dependencyIdMap, estimatedTaskMap);
             //update currentEstimatedDeadline
             Instant estimatedTime = dependency.getEstimatedDeadline().minus(dependency.getDifficulty(), ChronoUnit.DAYS);
-            if (currentEstimatedDeadline.isAfter(estimatedTime)) {
+            if (currentEstimatedDeadline == null || currentEstimatedDeadline.isAfter(estimatedTime)) {
                 currentEstimatedDeadline = estimatedTime;
             }
+        }
+        if (currentEstimatedDeadline == null) {
+            currentEstimatedDeadline = Instant.MAX;
         }
         currentTask.setEstimatedDeadline(currentEstimatedDeadline);
     }

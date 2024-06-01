@@ -1,148 +1,298 @@
 <template>
   <div v-if="this.$store?.state?.showTaskPage">
     <div class="taskPage">
-      <div class="taskPage1st">
-        <div class="name_and_button">
-          <a class="font-bold ">{{ task.name }}</a>
-          <a class="font-bold ">PRIORITY {{ task.priority }}</a>
-        </div>
-        <div class="task_properties2">
-          <a class="border-t-2"><b>DIFFICULTY:</b> {{ task.difficulty }}</a>
-          <a>{{ task.stage }} {{ task.stage === 'IN_PROGRESS' ? '(' + task.progress + ' % done)' : '' }}</a>
-        </div>
-        <div class="description_container2">
-          <div class="description2">
-            {{ task.description }}
-          </div>
-        </div>
-        <a><b>PROJECT:</b> {{  task.projectId == null ? 'unassigned' : task.projectId }}
-          <a class="deadline_text" v-if="task.projectId !== null">   (<a
-              class="text-red-500">DEADLINE:</a> {{ format(parseISO(task.deadline), "MMMM dd, yyyy") }})   </a>
-        </a>
-        <div class="task_properties">
-          <a class="font-bold ">Depends on:</a>
-          <table class="table-auto w-full content-center">
-            <tbody class="text-center">
-            <tr v-for="taskDependency in this.$store?.state?.taskDependencies" :key="taskDependency.id">
-              <td class="border px-4 py-2">{{ taskDependency.name }}</td>
-              <td class="border px-4 py-2">STAGE: {{ taskDependency.stage }}</td>
-              <td class="border px-4 py-2">PRIORITY: {{ taskDependency.priority }}</td>
-              <td class="border px-4 py-2">
-                <button
-                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                    type="button" @click="removeTaskDependency(task.id, taskDependency.id)">
-                  Delete
-                </button>
-              </td>
-              <td class="border px-4 py-2">
-                <button
-                    class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                    type="button" @click="openTask(taskDependency)">
-                  ...
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td class="border px-4 py-2">
-                <select
-                    class="resize-y overflow-auto shadow appearance-none border rounded w-full py-3 px-4 text-lg text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="description"  v-model="toAddDependency">
-                  <option v-for="otherTask in addableDependencies"
-                          :key="otherTask.id"
-                          :value="otherTask.id">
-                    {{ otherTask.name + ' ' + '(Stage: ' + otherTask.stage + ' | Priority: ' + otherTask.priority + ')'}}
-                  </option>
-                </select>
-              </td>
-              <td class="border px-4 py-2"
-                  v-if="toAddDependency !== undefined && toAddDependency !== '' && toAddDependency !== null">
-                <button
-                    class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                    type="button" @click="addTaskDependency(task.id, toAddDependency)">
-                  Add New Dependency?
-                </button>
-              </td>
-            </tr>
-            </tbody>
-          </table>
+      <v-card class="taskPage1st beautifulShadow">
 
-          <a class="font-bold ">Is depended by:</a>
-          <table class="table-auto w-full content-center">
-            <tbody class="text-center">
-            <tr v-for="taskDependency in this.$store?.state?.taskDependenciesOn" :key="taskDependency.id">
-              <td class="border px-4 py-2">{{taskDependency.name }}</td>
-              <td class="border px-4 py-2">STAGE: {{ taskDependency.stage }}</td>
-              <td class="border px-4 py-2">PRIORITY: {{ taskDependency.priority }}</td>
-              <td class="border px-4 py-2">
-                <button
-                  class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                  type="button" @click="removeTaskDependency(taskDependency.id, task.id)">
-                Delete
-              </button>
-              </td>
-              <td class="border px-4 py-2">
-                <button
-                    class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                    type="button" @click="openTask(taskDependency)">
-                  ...
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td class="border px-4 py-2">
-                <select
-                    class="resize-y overflow-auto shadow appearance-none border rounded w-full py-3 px-4 text-lg text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="description"  v-model="toAddDependencyOn">
-                  <option v-for="otherTask in addableDependencies"
-                          :key="otherTask.id"
-                          :value="otherTask.id">
-                    {{ otherTask.name + ' ' + '(Stage: ' + otherTask.stage + ' | Priority: ' + otherTask.priority + ')'}}
-                  </option>
-                </select>
-              </td>
-              <td class="border px-4 py-2"
-                  v-if="toAddDependencyOn !== undefined && toAddDependencyOn !== '' && toAddDependencyOn !== null">
-                <button
-                    class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                    type="button" @click="addTaskDependency(toAddDependencyOn, task.id)">
-                  Add New Dependency?
-                </button>
-              </td>
-            </tr>
-            </tbody>
-          </table>
+        <v-card-title class="text-body-2 d-flex align-center border-b-2 mb-5 ">
+
+          <div class="text-h4"><a class="font-weight-bold">
+            <v-icon
+                color="#1e90ff"
+                class="mb-1"
+                icon="mdi-checkbox-blank-outline"
+                start
+            ></v-icon>
+            {{ task.name }}</a></div>
+          <v-spacer></v-spacer>
+          <v-chip
+              class="ms-2 text-medium"
+              :prepend-icon="task.stage === 'IN_PROGRESS' ? 'mdi-progress-check':
+             task.stage === 'TO_DO' ? 'mdi-progress-helper' : 'mdi-checkbox-check-all' "
+              color="black"
+              size="large"
+              :text="task.stage === 'IN_PROGRESS' ? ' In Progress (' + task.progress+ '% DONE)':
+             task.stage === 'TO_DO' ? 'To Do' : 'Completed'"
+              variant="outlined"
+          ></v-chip>
+          <v-chip
+              class="ms-2 text-medium"
+              prepend-icon="mdi-decagram"
+              size="large"
+              color="#1e90ff"
+              :text="'Difficulty: ' + task.difficulty"
+              variant="outlined"
+          ></v-chip>
+          <v-chip
+              class="ms-2 text-medium"
+              prepend-icon="mdi-checkbox-blank-circle"
+              color="green"
+              size="large"
+              text="Low Priority"
+              v-if="task.priority === 'LOW'"
+              variant="outlined"
+          ></v-chip>
+          <v-chip
+              class="ms-2 text-medium"
+              prepend-icon="mdi-checkbox-blank-circle"
+              color="orange"
+              size="large"
+              text="Medium Priority"
+              v-if="task.priority === 'MEDIUM'"
+              variant="outlined"
+          ></v-chip>
+          <v-chip
+              class="ms-2 text-medium"
+              prepend-icon="mdi-checkbox-blank-circle"
+              color="red"
+              size="large"
+              text="High Priority"
+              v-if="task.priority === 'HIGH'"
+              variant="outlined"
+          ></v-chip>
+        </v-card-title>
+
+        <a><b>PROJECT:</b> {{ task.projectId == null ? 'unassigned' : task.project.name }}</a>
+        <v-divider></v-divider>
+        <a v-if="task.projectId !== null && task.deadline !== null">
+          <a class="text-red-500"><b>DEADLINE:</b></a> {{ format(parseISO(task.deadline), "MMMM dd, yyyy") }} </a>
+        <v-textarea class="mt-5" id="description" rows="10" min-width="500px" type="text" label="Description"
+                    v-model="task.description" :readonly="true"/>
+
+        <v-card-title class="d-flex align-center pe-2">
+          <v-icon icon="mdi-chevron-double-left"></v-icon> &nbsp;
+          Depends on:
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-expansion-panels>
+          <v-expansion-panel
+              v-for="taskDependency in this.$store?.state?.taskDependencies"
+              :key="taskDependency.id"
+              :value="taskDependency"
+          >
+            <v-expansion-panel-title v-slot="{ expanded }">
+              <div>
+                <v-icon
+                    color="#1e90ff"
+                    class="mb-1"
+                    icon="mdi-checkbox-blank-outline"
+                    start
+                ></v-icon>
+                {{ taskDependency.name }}
+              </div>
+              <v-spacer></v-spacer>
+              <v-chip
+                  class="ms-2 text-medium"
+                  :prepend-icon="taskDependency.stage === 'IN_PROGRESS' ? 'mdi-progress-check':
+             taskDependency.stage === 'TO_DO' ? 'mdi-progress-helper' : 'mdi-checkbox-check-all' "
+                  color="black"
+                  size="small"
+                  :text="taskDependency.stage === 'IN_PROGRESS' ? ' In Progress (' + taskDependency.progress+ '% DONE)':
+             taskDependency.stage === 'TO_DO' ? 'To Do' : 'Completed'"
+                  variant="outlined"
+              ></v-chip>
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-decagram"
+                  size="small"
+                  color="#1e90ff"
+                  :text="'Difficulty: ' + taskDependency.difficulty"
+                  variant="outlined"
+              ></v-chip>
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-checkbox-blank-circle"
+                  color="green"
+                  size="small"
+                  text="Low Priority"
+                  v-if="taskDependency.priority === 'LOW'"
+                  variant="outlined"
+              ></v-chip>
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-checkbox-blank-circle"
+                  color="orange"
+                  size="small"
+                  text="Medium Priority"
+                  v-if="taskDependency.priority === 'MEDIUM'"
+                  variant="outlined"
+              ></v-chip>
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-checkbox-blank-circle"
+                  color="red"
+                  size="small"
+                  text="High Priority"
+                  v-if="taskDependency.priority === 'HIGH'"
+                  variant="outlined"
+              ></v-chip>
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <v-chip
+                  class="bg-red-300 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+                  type="button" prepend-icon="mdi-delete" @click="removeTaskDependency(task.id, taskDependency.id)">
+                Delete Dependency
+              </v-chip>
+              <v-chip
+                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+                  type="button" prepend-icon="mdi-eye" @click="openTask(taskDependency)">
+                Open Task
+              </v-chip>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
+        <div class="flex align-center">
+          <v-select
+              class="mt-5"
+              :items="addableDependencies"
+              :item-title="item => item.name !== undefined ? item.name +' (Stage: '+ item.stage +' | Priority: ' + item.priority +')' : 'Choose a task'"
+              item-value="id"
+              label="Add New Dependency?"
+              v-model="toAddDependency"
+          >
+          </v-select>
+          <v-btn
+              icon="mdi-plus"
+              class="bg-blue-400 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline ml-2"
+              v-if="toAddDependency !== ''"
+              type="button" @click="addTaskDependency(task.id, toAddDependency)"/>
         </div>
+        <v-card-title class="d-flex align-center pe-2">
+          <v-icon icon="mdi-chevron-double-right"></v-icon> &nbsp;
+          Is depended by:
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-expansion-panels>
+          <v-expansion-panel
+              v-for="taskDependency in this.$store?.state?.taskDependenciesOn"
+              :key="taskDependency.id"
+              :value="taskDependency"
+          >
+            <v-expansion-panel-title v-slot="{ expanded }">
+              <div></div>
+              <div>
+                <v-icon
+                    color="#1e90ff"
+                    class="mb-1"
+                    icon="mdi-checkbox-blank-outline"
+                    start
+                ></v-icon>
+                {{ taskDependency.name }}
+              </div>
+              <v-spacer></v-spacer>
+              <v-chip
+                  class="ms-2 text-medium"
+                  :prepend-icon="taskDependency.stage === 'IN_PROGRESS' ? 'mdi-progress-check':
+             taskDependency.stage === 'TO_DO' ? 'mdi-progress-helper' : 'mdi-checkbox-check-all' "
+                  color="black"
+                  size="small"
+                  :text="taskDependency.stage === 'IN_PROGRESS' ? ' In Progress (' + taskDependency.progress+ '% DONE)':
+             taskDependency.stage === 'TO_DO' ? 'To Do' : 'Completed'"
+                  variant="outlined"
+              ></v-chip>
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-decagram"
+                  size="small"
+                  color="#1e90ff"
+                  :text="'Difficulty: ' + taskDependency.difficulty"
+                  variant="outlined"
+              ></v-chip>
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-checkbox-blank-circle"
+                  color="green"
+                  size="small"
+                  text="Low Priority"
+                  v-if="taskDependency.priority === 'LOW'"
+                  variant="outlined"
+              ></v-chip>
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-checkbox-blank-circle"
+                  color="orange"
+                  size="small"
+                  text="Medium Priority"
+                  v-if="taskDependency.priority === 'MEDIUM'"
+                  variant="outlined"
+              ></v-chip>
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-checkbox-blank-circle"
+                  color="red"
+                  size="small"
+                  text="High Priority"
+                  v-if="taskDependency.priority === 'HIGH'"
+                  variant="outlined"
+              ></v-chip>
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <v-chip
+                  class="bg-red-300 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+                  type="button" prepend-icon="mdi-delete" @click="removeTaskDependency(taskDependency.id, task.id)">
+                Delete Dependency
+              </v-chip>
+              <v-chip
+                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+                  type="button" prepend-icon="mdi-eye" @click="openTask(taskDependency)">
+                Open Task
+              </v-chip>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
+        <div class="flex align-center">
+          <v-select
+              class="mt-5"
+              :items="addableDependencies"
+              :item-title="item => item.name !== undefined ? item.name +' (Stage: '+ item.stage +' | Priority: ' + item.priority +')' : 'Choose a task'"
+              item-value="id"
+              label="Add New Dependency?"
+              placeholder="Choose Task"
+              v-model="toAddDependencyOn"
+          >
+          </v-select>
+          <v-btn
+              icon="mdi-plus"
+              class="bg-blue-400 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline ml-2"
+              v-if="toAddDependencyOn !== ''"
+              type="button" @click="addTaskDependency(toAddDependencyOn, task.id)"/>
+        </div>
+
         <div class="flex items-end justify-end pt-3.5">
-          <button
-              class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-              type="button" @click="removeTask(task.id)">
-            Delete
-          </button>
-          <button
+          <v-btn
               class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
               type="button" @click="updateTask(task)">
             Update
-          </button>
+          </v-btn>
         </div>
-      </div>
+      </v-card>
       <div class="taskPage2nd">
-        <button
+        <v-btn
+            icon="mdi-close"
             class="h-10 left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-3xl focus:outline-none focus:shadow-outline"
-            type="button" @click="exitTask">
-          X
-        </button>
+            type="button" @click="exitTask"/>
       </div>
     </div>
   </div>
 </template>
 <script>
 import {format, parseISO} from "date-fns";
+
 export default {
-  computed:{
+  computed: {
     addableDependencies: function () {
       return this.$store?.state?.tasks.filter(otherTask => !this.$store?.state?.taskDependencies.map(task => task.id).includes(otherTask.id)
           && !this.$store?.state?.taskDependenciesOn.map(task => task.id).includes(otherTask.id)
-          && otherTask.id !== this.task.id )
+          && otherTask.id !== this.task.id)
     },
   },
   data() {
@@ -167,7 +317,7 @@ export default {
     exitTask() {
       this.$store?.commit('setShowTaskPage', false);
       this.$store?.commit('setShowTasks', true);
-      this.$store?.commit('fetchTasks', true);
+      /*this.$store?.commit('fetchTasks', true);*/
     },
     removeTask(id) {
       this.$store?.commit('removeTask', id);
@@ -261,4 +411,7 @@ export default {
   margin-bottom: 1%;
 }
 
+.beautifulShadow {
+  box-shadow: -17px 17px 7px 0px rgba(0, 0, 0, 0.13), 0px 1px 2px 0px rgba(0, 0, 0, 0.11);
+}
 </style>

@@ -8,8 +8,8 @@
         </div>
       </div>
       <div class="account_info">
-        <a>{{this.$store?.state?.currentUser.username}}</a>
-        <a>{{this.$store?.state?.currentUser.email}}</a>
+        <a><v-icon icon="mdi-account"/> {{this.$store?.state?.currentUser.username}}</a>
+        <a><v-icon icon="mdi-email-outline"/> {{this.$store?.state?.currentUser.email}}</a>
       </div>
     </div>
     <div class="menu_buttons">
@@ -33,7 +33,7 @@
     </div>
   </div>
   <div class="title">
-    <h1 class="title_text">TaskTide</h1>
+    <h1 class="title_text">TASKTIDE <v-icon icon="mdi-checkbox-marked-circle-outline"/></h1>
   </div>
 </template>
 
@@ -109,7 +109,8 @@ export default {
   align-content: stretch;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 4px 40px 80px rgba(0, 0, 0, 0.1);
+  box-shadow: 17px -2px 12px -5px rgba(32,29,29,0.13),
+  0px 1px 1px 0px rgba(0,0,0,0.11);
   z-index: 200;
 }
 .title {
@@ -119,13 +120,12 @@ export default {
   top: 0;
   position: absolute;
   background-color: white;
-  font-size: xxx-large;
+  font-size: xx-large;
   font-weight: bold;
   align-items: center;
   display: flex;
-  justify-content: flex-end;
-  border-bottom: 3px solid gray;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  justify-content: center;
+  box-shadow: 14px 17px 12px -5px rgba(32,29,29,0.13), 0px 1px 1px 0px rgba(0,0,0,0.11);
   z-index: 201;
 }
 .title_text {
@@ -227,5 +227,6 @@ export default {
   background-color: royalblue;
   outline: none;
   box-shadow: none;
+  font-family: Arial, Helvetica, sans-serif
 }
 </style>

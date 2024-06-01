@@ -1,70 +1,80 @@
 <template>
   <div v-if="this.$store?.state?.showEditTask">
     <div class="zoneAddTask">
-      <div class="w-full max-w-xs mx-auto">
-        <div class="bg-white shadow-md rounded-3xl px-8 pt-6 pb-8 mb-4">
-          <div class="mb-4 mt-4">
-            <input
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="name" type="text" placeholder="Name" v-model="updateName"/>
+      <div class="w-full max-w-xs mx-auto flex justify-center">
+        <div class="bg-white shadow-md rounded-3xl px-8 pt-6 pb-8 mb-4 flex beautifulShadow">
+          <div class="mr-6">
+            <v-text-field
+                hide-details="auto"
+                class="mb-5"
+                label="Name"
+                v-model="updateName"
+            ></v-text-field>
+            <v-textarea id="description" rows="10" min-width="500px" type="text" placeholder="Description" v-model="updateDescription" />
           </div>
-          <div class="mb-6">
-            <input
-                class="resize-y overflow-auto shadow appearance-none border rounded w-full py-3 px-4 text-lg text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="description" type="text" placeholder="Description" v-model="updateDescription"/>
-          </div>
+          <div class="mr-6">
 
-          <div class="mb-6">
-            <label class="font-bold">Difficulty:</label>
-            <input
-                class="resize-y overflow-auto shadow appearance-none border rounded w-full py-3 px-4 text-lg text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="description" type="number" placeholder="Difficulty" v-model="updateDifficulty"/>
-          </div>
-          <div class="mb-6">
-            <label class="font-bold">Progress:</label>
-            <input
-                class="resize-y overflow-auto shadow appearance-none border rounded w-full py-3 px-4 text-lg text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="description" type="number" placeholder="Progress" v-model="updateProgress"/>
-          </div>
-          <div class="mb-6">
-            <label class="font-bold">Priority:</label>
-            <select
-                class="resize-y overflow-auto shadow appearance-none border rounded w-full py-3 px-4 text-lg text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="description" v-model="updatePriority">
-              <option value="LOW">LOW</option>
-              <option value="MEDIUM">MEDIUM</option>
-              <option value="HIGH">HIGH</option>
-            </select>
-          </div>
+            <v-select
+                class="mb-1"
+                :items="priorityValues"
+                density="compact"
+                label="Priority"
+                v-model = "updatePriority"
+            ></v-select>
 
-          <div class="mb-6">
-            <label class="font-bold">Priority:</label>
-            <select
-                class="resize-y overflow-auto shadow appearance-none border rounded w-full py-3 px-4 text-lg text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="description" v-model="updateStage">
-              <option value="TO_DO">TO_DO</option>
-              <option value="IN_PROGRESS">IN_PROGRESS</option>
-              <option value="COMPLETED">COMPLETED</option>
-            </select>
-          </div>
+            <v-select
+                class="mb-1"
+                :items="stages"
+                density="compact"
+                label="Priority"
+                v-model = "updateStage"
+            ></v-select>
 
-          <div class="flex items-end">
-            <button
-                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                type="button" @click="removeTask(editTaskId)">
-              Delete
-            </button>
-            <button
-                class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                type="button" @click="updateTask">
-              Update
-            </button>
-            <button
-                class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                type="button" @click="cancelUpdate">
-              Cancel
-            </button>
+            <div v-if="updateStage === 'IN_PROGRESS'">
+              <div class="text-caption">
+                Progress (% DONE):
+              </div>
+              <v-slider
+                  v-model="updateProgress"
+                  :thumb-size="26"
+                  thumb-label
+                  :step="1"
+              ></v-slider>
+            </div>
+            <v-text-field
+                hide-details="auto"
+                class="mb-5"
+                type="number"
+                label="Difficulty"
+                :rules="[value => value >= 0 || 'No negative numbers allowed']"
+                v-model="updateDifficulty"
+            ></v-text-field>
+            <div class="flex items-end justify-end">
+              <v-btn
+                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline mb-5"
+                  type="button" @click="estimateDifficulty">
+                Estimate Difficulty
+              </v-btn>
+            </div>
+            <div class="flex items-end justify-end">
+              <v-btn
+                  class="mr-5"
+                  type="button" @click="cancelUpdate">
+                Cancel
+              </v-btn>
 
+              <v-btn
+                  class="mr-5 bg-red-300 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+                  type="button" @click="removeTask(editTaskId)">
+                Delete
+              </v-btn>
+
+              <v-btn
+                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+                  type="button" @click="updateTask">
+                Update
+              </v-btn>
+            </div>
           </div>
         </div>
       </div>
@@ -76,12 +86,15 @@ export default {
   data() {
     return {
       editTaskId: this.$store?.state?.editTaskId ?? '',
+      task: this.$store?.state?.task ?? '',
       updateName: this.$store?.state?.updateName ?? '',
       updateDescription: this.$store?.state?.updateDescription ?? '',
       updateDifficulty: this.$store?.state?.updateDifficulty ?? '',
       updatePriority: this.$store?.state?.updatePriority ?? '',
       updateStage: this.$store?.state?.updateStage ?? '',
       updateProgress: this.$store?.state?.updateProgress ?? '',
+      priorityValues: ['LOW', 'MEDIUM', 'HIGH'],
+      stages: ['TO_DO', 'IN_PROGRESS', 'COMPLETED'],
     };
   },
   watch: {
@@ -130,19 +143,26 @@ export default {
         difficulty: this.updateDifficulty,
         priority: this.updatePriority,
         stage: this.updateStage,
-        progress: this.updateProgress
+        progress: this.updateProgress,
+        projectId: this.task.projectId,
+        deadline: this.task.deadline,
+
       });
       this.$store?.commit('setShowEditTask', false);
       this.$store?.commit('setShowTasks', true);
     },
     cancelUpdate() {
       this.$store?.commit('setShowEditTask', false);
-      this.$store?.commit('setShowTasks', true);
+      this.$store?.commit('setShowTaskPage', true);
     },
     removeTask(id) {
       this.$store?.commit('removeTask', id);
       this.$store?.commit('setShowEditTask', false);
       this.$store?.commit('setShowTasks', true);
+    },
+    estimateDifficulty() {
+      this.$store?.commit('estimateDifficulty', {text: this.updateDescription});
+      this.updateDifficulty = this.$store?.state?.updateDifficulty ?? '';
     },
   },
 };

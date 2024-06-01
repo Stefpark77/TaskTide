@@ -1,50 +1,54 @@
 <template>
   <div v-if="this.$store?.state?.showAddTask">
     <div class="zoneAddTask">
-      <div class="w-full max-w-xs mx-auto">
-        <div class="bg-white shadow-md rounded-3xl px-8 pt-6 pb-8 mb-4">
-          <div class="mb-4 mt-4">
-            <input
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="name" type="text" placeholder="Name" v-model="addName"/>
+      <div class="w-full max-w-xs mx-auto flex justify-center">
+        <div class="bg-white shadow-md rounded-3xl px-8 pt-6 pb-8 mb-4 flex beautifulShadow">
+          <div class="mr-6">
+            <v-text-field
+                hide-details="auto"
+                class="mb-5"
+                label="Name"
+                v-model="addName"
+            ></v-text-field>
+            <v-textarea id="description" rows="10" min-width="500px" type="text" placeholder="Description" v-model="addDescription" />
           </div>
-          <div class="description_container">
-            <input
-                class="description"
-                id="description" type="text" placeholder="Description" v-model="addDescription"/>
-          </div>
-          <div class="mb-6">
-            <input
-                class="resize-y overflow-auto shadow appearance-none border rounded w-full py-3 px-4 text-lg text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="description" type="number" placeholder="Difficulty" v-model="addDifficulty"/>
-          </div>
-          <div class="mb-6">
-            <label class="font-bold">Priority:</label>
-            <select
-                class="resize-y overflow-auto shadow appearance-none border rounded w-full py-3 px-4 text-lg text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="description"  v-model="addPriority">
-              <option value="LOW">LOW</option>
-              <option value="MEDIUM">MEDIUM</option>
-              <option value="HIGH">HIGH</option>
-            </select>
-          </div>
-          <div class="flex items-end">
+          <div class="mr-6">
 
-            <button
-                class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                type="button" @click="estimateDifficulty">
-              Estimate Difficulty
-            </button>
-            <button
-                class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                type="button" @click="addTask">
-              Add Task
-            </button>
-            <button
-                class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                type="button" @click="cancelAdd">
-              Cancel
-            </button>
+            <v-select
+                class="mb-5"
+                :items="priorityValues"
+                density="compact"
+                label="Priority"
+                v-model = "addPriority"
+            ></v-select>
+
+            <v-text-field
+                hide-details="auto"
+                class="mb-5"
+                type="number"
+                label="Difficulty"
+                :rules="[value => value >= 0 || 'No negative numbers allowed']"
+                v-model="addDifficulty"
+            ></v-text-field>
+            <div class="flex items-end justify-end">
+              <v-btn
+                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline mb-5"
+                  type="button" @click="estimateDifficulty">
+                Estimate Difficulty
+              </v-btn>
+            </div>
+            <div class="flex items-end justify-end">
+              <v-btn
+                  class="mr-5"
+                  type="button" @click="cancelAdd">
+                Cancel
+              </v-btn>
+              <v-btn
+                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+                  type="button" @click="addTask">
+                Add Task
+              </v-btn>
+            </div>
           </div>
         </div>
       </div>
@@ -59,7 +63,8 @@ export default {
       addName: this.$store?.state?.addName ?? '',
       addDescription: this.$store?.state?.addDescription ?? '',
       addDifficulty: this.$store?.state?.addDifficulty ?? '',
-      addPriority: this.$store?.state?.addPriority ?? '',
+      addPriority: this.$store?.state?.addPriority ?? 'LOW',
+      priorityValues: ['LOW', 'MEDIUM', 'HIGH']
     };
   },
   watch: {

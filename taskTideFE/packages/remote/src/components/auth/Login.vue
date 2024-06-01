@@ -186,6 +186,7 @@ export default {
   border-radius: 35px;
   justify-content: center;
   font-size: x-large;
+  font-family: Arial, Helvetica, sans-serif
 }
 
 .standard_button:hover {

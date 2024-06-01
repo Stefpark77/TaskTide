@@ -1,55 +1,58 @@
 <template>
   <div v-if="this.$store?.state?.showEditEvent">
     <div class="zoneAddEvent">
-      <div class="w-full max-w-xs mx-auto">
-        <div class="bg-white shadow-md rounded-3xl px-8 pt-6 pb-8 mb-4">
-          <div class="mb-4 mt-4">
-            <input
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="name" type="text" placeholder="Name" v-model="updateName"/>
-          </div>
-          <div class="mb-6">
-            <input
-                class="resize-y overflow-auto shadow appearance-none border rounded w-full py-3 px-4 text-lg text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="description" type="text" placeholder="Description" v-model="updateDescription"/>
-          </div>
-          <div class="mb-6">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="date">
-              Start Date:
-            </label>
-            <input
-                class="mb-6 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="date" type="date" placeholder="Date" v-model="updateDate"/>
-            <input class="mb-6 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                   type="time" id="dateTime" placeholder="dateTime" v-model="updateDateTime" />
-          </div>
-          <div class="mb-6">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="date">
-              End Date:
-            </label>
-            <input
-                class="mb-6 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="date" type="date" placeholder="Date" v-model="updateEndDate"/>
-            <input class="mb-6 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                   type="time" id="endDateTime" placeholder="endDateTime"  v-model="updateEndDateTime"/>
-          </div>
-          <div class="flex items-end">
-            <button
-                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                type="button" @click="removeEvent(editEventId)">
-              Delete
-            </button>
-            <button
-                class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                type="button" @click="updateEvent">
-              Update
-            </button>
-            <button
-                class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                type="button" @click="cancelUpdate">
-              Cancel
-            </button>
+      <div class="w-full max-w-xs mx-auto flex justify-center">
+        <div class="bg-white shadow-md rounded-3xl px-8 pt-6 pb-8 mb-4 flex beautifulShadow">
+          <div class="mr-6">
+            <v-text-field
+                hide-details="auto"
+                class="mb-5"
+                label="Name"
+                v-model="updateName"
+            ></v-text-field>
+            <v-textarea id="description" rows="10" min-width="500px" type="text" placeholder="Description" v-model="updateDescription" />
 
+          </div>
+          <div class="mr-6">
+            <v-text-field type="datetime-local"
+                          label = "Start Date"
+                          v-model="updateDate"
+            ></v-text-field>
+
+            <v-text-field type="datetime-local"
+                          label = "End Date"
+                          v-model="updateEndDate"
+                          :disabled="fullDay"
+            ></v-text-field>
+
+            <v-select
+                class="mb-5"
+                :items="recurringValues"
+                density="compact"
+                label="Recurring"
+                v-model = "recurring"
+            ></v-select>
+
+            <v-checkbox label="All Day" v-model = "fullDay"></v-checkbox>
+
+            <div class="flex items-end">
+
+              <v-btn
+                  class="mr-5"
+                  type="button" @click="cancelUpdate">
+                Cancel
+              </v-btn>
+              <v-btn
+                  class="bg-red-200 mr-5 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+                  type="button" @click="removeEvent(editEventId)">
+                Delete
+              </v-btn>
+              <v-btn
+                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+                  type="button" @click="updateEvent">
+                Update
+              </v-btn>
+            </div>
           </div>
         </div>
       </div>
@@ -64,9 +67,10 @@ export default {
           updateName: this.$store?.state?.updateName ?? '',
           updateDescription: this.$store?.state?.updateDescription ?? '',
           updateDate: this.$store?.state?.updateDate ?? '',
-          updateDateTime: this.$store?.state?.updateDateTime ?? '',
           updateEndDate: this.$store?.state?.updateEndDate ?? '',
-          updateEndDateTime: this.$store?.state?.updateEndDateTime ?? '',
+          fullDay: false,
+          recurring: this.$store?.state?.updateRecurring ?? 'ONCE',
+          recurringValues: ['ONCE', 'WEEKLY', 'BIWEEKLY', 'MONTHLY', 'ANNUAL'],
         };
     },
     watch: {
@@ -88,28 +92,16 @@ export default {
           },
           deep: true,
         },
-      updateDateTime: {
-        handler: function (val) {
-          this.$store?.commit('setUpdateDateTime', val);
-        },
-        deep: true,
-      },
       updateEndDate: {
         handler: function (val) {
           this.$store?.commit('setUpdateEndDate', val);
         },
         deep: true,
       },
-      updateEndDateTime: {
-        handler: function (val) {
-          this.$store?.commit('setUpdateEndDateTime', val);
-        },
-        deep: true,
-      },
     },
     methods: {
       updateEvent() {
-            this.$store?.commit('updateEvent', { name: this.updateName, description: this.updateDescription,  date: this.updateDate,  endDate: this.updateEndDate, startTime: this.updateDateTime, endTime: this.updateEndDateTime});
+            this.$store?.commit('updateEvent', { name: this.updateName, description: this.updateDescription,  date: this.updateDate,  endDate: this.updateEndDate, recurringTime: this.recurring, fullDay: this.fullDay});
             this.$store?.commit('setShowEditEvent', false);
             this.$store?.commit('setShowEvents', true);
         },

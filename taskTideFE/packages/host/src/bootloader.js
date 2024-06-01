@@ -101,6 +101,7 @@ const store = createStore({
             updateDateTime: '',
             updateEndDate: '',
             updateEndDateTime: '',
+            updateRecurring: '',
             /*task services*/
             tasks: [],
             allTasks: [],
@@ -159,7 +160,7 @@ const store = createStore({
         },
         async signUp(state, user) {
             try {
-                if(user.cPassword !== user.password) throw new Error('The Password fields must match!');
+                if (user.cPassword !== user.password) throw new Error('The Password fields must match!');
                 delete user.cPassword;
                 const response = await signUp(user);
 
@@ -233,19 +234,22 @@ const store = createStore({
         async createEvent(state, event) {
             console.log(event);
             try {
-                const dateObject = parseISO(event.date);
-                const timeParts = event.startTime.split(':');
-                dateObject.setHours(parseInt(timeParts[0], 10));
-                dateObject.setMinutes(parseInt(timeParts[1], 10));
-                event.date = format(dateObject, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-                delete event.startTime;
-
-                const endDateObject = parseISO(event.endDate);
-                const endTimeParts = event.endTime.split(':');
-                endDateObject.setHours(parseInt(endTimeParts[0], 10));
-                endDateObject.setMinutes(parseInt(endTimeParts[1], 10));
-                event.endDate = format(endDateObject, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-                delete event.endTime;
+                if (event.fullDay) {
+                    const dateObject = parseISO(event.date);
+                    dateObject.setHours(0);
+                    dateObject.setMinutes(0);
+                    event.date = format(dateObject, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+                    dateObject.setHours(23);
+                    dateObject.setMinutes(59);
+                    event.endDate = format(dateObject, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+                    delete event.fullDay;
+                } else {
+                    const dateObject = parseISO(event.date);
+                    event.date = format(dateObject, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+                    const endDateObject = parseISO(event.endDate);
+                    event.endDate = format(endDateObject, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+                    delete event.fullDay;
+                }
 
                 event.userId = localStorage.getItem("userId")
                 console.log(event);
@@ -273,28 +277,31 @@ const store = createStore({
             state.editEventId = event.id;
             state.updateName = event.name;
             state.updateDescription = event.description;
-            state.updateDate = format(parseISO(event.date), "yyyy-MM-dd");
-            state.updateDateTime = format(parseISO(event.date), "HH:mm");
-            state.updateEndDate = format(parseISO(event.endDate), "yyyy-MM-dd");
-            state.updateEndDateTime = format(parseISO(event.endDate), "HH:mm");
+            state.updateDate = format(parseISO(event.date), "yyyy-MM-dd'T'HH:mm:ss");
+            state.updateEndDate = format(parseISO(event.endDate), "yyyy-MM-dd'T'HH:mm:ss");
+            state.updateRecurring = event.recurringTime;
 
         },
         async updateEvent(state, event) {
             try {
                 event.id = state.editEventId;
-                const dateObject = parseISO(event.date);
-                const timeParts = event.startTime.split(':');
-                dateObject.setHours(parseInt(timeParts[0], 10));
-                dateObject.setMinutes(parseInt(timeParts[1], 10));
-                event.date = format(dateObject, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-                delete event.startTime;
+                if (event.fullDay) {
+                    const dateObject = parseISO(event.date);
+                    dateObject.setHours(0);
+                    dateObject.setMinutes(0);
+                    event.date = format(dateObject, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+                    dateObject.setHours(23);
+                    dateObject.setMinutes(59);
+                    event.endDate = format(dateObject, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+                    delete event.fullDay;
+                } else {
+                    const dateObject = parseISO(event.date);
+                    event.date = format(dateObject, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+                    const endDateObject = parseISO(event.endDate);
+                    event.endDate = format(endDateObject, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+                    delete event.fullDay;
+                }
 
-                const endDateObject = parseISO(event.endDate);
-                const endTimeParts = event.endTime.split(':');
-                endDateObject.setHours(parseInt(endTimeParts[0], 10));
-                endDateObject.setMinutes(parseInt(endTimeParts[1], 10));
-                event.endDate = format(endDateObject, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-                delete event.endTime;
                 event.userId = localStorage.getItem("userId")
 
                 console.log(event);
@@ -337,6 +344,18 @@ const store = createStore({
                 if (response.status !== 200) throw new Error('Failed to get tasks');
 
                 state.tasks = response.data;
+                let updatedTasks = [];
+                for(let task of state.tasks){
+                    if(task.projectId!==null){
+                        const projectResponse = await getProjectByProjectId(task.projectId, localStorage.getItem("token"));
+                        task.project = projectResponse.data;
+                    }else{
+                        task.project = null;
+                    }
+                    updatedTasks.push(task);
+                }
+                state.tasks = updatedTasks;
+                console.log( state.tasks);
             } catch (error) {
                 console.error(error);
             }
@@ -521,6 +540,7 @@ const store = createStore({
 
                 console.log(response.data)
                 state.addDifficulty = response.data.difficulty;
+                state.updateDifficulty = response.data.difficulty;
             } catch (error) {
                 console.error(error);
             }
@@ -804,13 +824,14 @@ const store = createStore({
     },
 });
 
-import { createVuetify } from 'vuetify';
+import {createVuetify} from 'vuetify';
 import 'vuetify/dist/vuetify.min.css'; // Make sure this line is here to import Vuetify styles
 import './index.scss'; // Ensure this line is here to import your custom styles
 import 'vuetify/styles'; // Vuetify 3 specific import
 import "@mdi/font/css/materialdesignicons.css";
-import { aliases, mdi } from "vuetify/lib/iconsets/mdi.mjs";
+import {aliases, mdi} from "vuetify/lib/iconsets/mdi.mjs";
 import {components, directives} from "vuetify/dist/vuetify";
+
 const vuetify = createVuetify({
     components,
     directives,

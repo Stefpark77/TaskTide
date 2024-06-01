@@ -1,33 +1,55 @@
 <template>
   <div v-if="this.$store?.state?.showProjects">
     <div class="zone">
-      <div class="flex justify-end">
-        <button
-            class="mt-5 mr-10 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl border-gray-50 border-2 focus:outline-none focus:shadow-outline"
-            type="button"
-            v-on:click="addProject">
-          Add New Project?
-        </button>
+      <div class="flex justify-start bg-white">
+        <v-spacer></v-spacer>
+        <v-tabs>
+          <v-tab
+              prepend-icon="mdi-file-document-plus-outline"
+              class="menu_button"
+              v-on:click="addProject">
+            New Project
+          </v-tab>
+        </v-tabs>
       </div>
       <div class="projects">
-        <div class="project" v-for="project in this.$store?.state?.projects" :key="project.id">
-          <div class="name_and_button">
-            <a class="font-bold ">{{ project.name }}</a>
-            <button
-                class="bg-white hover:bg-blue-700 text-black  hover:text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                type="button" @click="openProject(project)">
-              ...
-            </button>
-          </div>
-          <div class="description_container">
-            <div class="description">
-              {{project.description.length > 255 ? project.description.slice(0, 255) + '...' : project.description }}
+
+        <v-card class="project" v-for="project in this.$store?.state?.projects" :key="project.id">
+          <v-card-item>
+            <v-card-title class="text-body-2 d-flex align-center ">
+
+              <div class="text-h6"><a class="font-bold"><v-icon
+                  color="#1e90ff"
+                  icon="mdi-text-box-multiple-outline"
+                  start
+              ></v-icon>{{ project.name }}</a></div>
+              <v-spacer></v-spacer>
+
+              <v-chip
+                  class="ms-2 text-medium-emphasis"
+                  prepend-icon="mdi-eye"
+                  color="#1e90ff"
+                  size="small"
+                  text="OPEN"
+                  variant="outlined"
+                  @click="openProject(project)"
+              ></v-chip>
+
+            </v-card-title>
+
+            <div class="py-2">
+              <div class="text-h6 border-b-2"><a class="font-bold"></a></div>
+
+              <div class="font-weight-light text-medium-emphasis">
+                {{ project.description.length > 255 ? project.description.slice(0, 255) + '...' : project.description }}
+              </div>
             </div>
-          </div>
-          <div class="deadlines">
-            <a class="deadline_text"><a class="text-red-500">DEADLINE:</a> {{ format(parseISO(project.deadline),"MMMM dd, yyyy")}}</a>
-          </div>
-        </div>
+          </v-card-item>
+          <v-card-item class="deadlines">
+            <a class="deadline_text"><a class="text-red-500">DEADLINE:</a>
+              {{ format(parseISO(project.deadline), "MMMM dd, yyyy") }}</a>
+          </v-card-item>
+        </v-card>
       </div>
     </div>
   </div>
@@ -69,60 +91,47 @@ export default {
   position: absolute;
   background-color: lightsteelblue;
 }
-.deadlines{
+
+.deadlines {
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
 }
-.deadline_text{
+
+.deadline_text {
   font-size: large;
   font-weight: bold;
 }
-.name_and_button{
+
+.name_and_button {
   display: flex;
   justify-content: space-between;
   margin-bottom: 1%;
   font-size: x-large;
 }
-.description_container{
-  display: flex;
-  justify-content: space-evenly;
-  margin-bottom: 1%;
-  min-height: 70%;
-}
-.description{
-  font-size: large;
-  display: flex;
-  justify-content: space-evenly;
-  border: 1px solid #ccc;
-  border-radius: 25px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 85%;
-  min-height: 94%;
-  padding: 20px;
-  margin-bottom: 1%;
-  overflow: auto; /* Add scrollbar when needed */
-}
+
 .projects {
   width: 100%;
-  height: 90%;
+  height: 96%;
   bottom: 0;
   right: 0;
   position: absolute;
   background-color: lightsteelblue;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); /* Adjust the minimum and maximum width of each column */
-  gap: 150px; /* Adjust the gap between cards */
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr)); /* Adjust the minimum and maximum width of each column */
+  gap: 100px; /* Adjust the gap between cards */
   overflow: auto; /* Add scrollbar when needed */
 }
+
 .project {
   width: 400px; /* Adjust the width of your card */
-  height: 500px; /* Adjust the height of your card */
+  height: 300px; /* Adjust the height of your card */
+  margin-top: 100px;
   margin-right: 150px; /* Adjust the margin between cards */
   margin-left: 150px; /* Adjust the margin between cards */
   border: 1px solid #ccc;
   border-radius: 25px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: -17px 17px 7px 0px rgba(0, 0, 0, 0.13), 0px 1px 2px 0px rgba(0, 0, 0, 0.11);
   padding: 20px;
   background-color: white;
   display: flex;

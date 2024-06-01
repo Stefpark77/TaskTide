@@ -1,109 +1,185 @@
 <template>
   <div v-if="this.$store?.state?.showProjectPage">
     <div class="projectPage">
-      <div class="projectPage1st">
-        <div class="name_and_button">
-          <a class="font-bold ">{{ project.name }}</a>
-        </div>
+      <v-card class="projectPage1st beautifulShadow">
+        <v-card-title class="text-body-2 d-flex align-center border-b-2 mb-5 ">
 
-        <div class="task_properties2">
-          <div class="border-t-2">
-          <a class="deadline_text"><a class="text-red-500">DEADLINE:</a> {{ format(parseISO(project.deadline),"MMMM dd, yyyy")}}</a>
-          </div>
+        <div class="text-h4"><a class="font-weight-bold">
+          <v-icon
+              color="#1e90ff"
+              class="mb-1"
+              icon="mdi-text-box-multiple-outline"
+              start
+          ></v-icon>
+          {{ project.name }}</a></div>
+        <v-spacer></v-spacer>
+        <a class="text-h5"><b class="text-red-500">DEADLINE: </b>{{ format(parseISO(project.deadline), "MMMM dd, yyyy") }}</a>
+      </v-card-title>
+        <v-textarea class="mt-5" id="description" rows="10" min-width="500px" type="text" label="Description"
+                    v-model="project.description" :readonly="true"/>
+        <v-card-title class="d-flex align-center pe-2">
+          <v-icon icon="mdi-checkbox-blank-outline"></v-icon> &nbsp;
+          Tasks:
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-expansion-panels>
+          <v-expansion-panel
+              v-for="projectTask in this.$store?.state?.projectTasks"
+              :key="projectTask.id"
+              :value="projectTask"
+          >
+            <v-expansion-panel-title v-slot="{ expanded }">
+              <div>
+                <v-icon
+                    color="#1e90ff"
+                    class="mb-1"
+                    icon="mdi-checkbox-blank-outline"
+                    start
+                ></v-icon>
+                {{ projectTask.name }}
+              </div>
+              <v-spacer></v-spacer>
+              <v-chip
+                  class="ms-2 text-medium"
+                  :prepend-icon="projectTask.stage === 'IN_PROGRESS' ? 'mdi-progress-check':
+             projectTask.stage === 'TO_DO' ? 'mdi-progress-helper' : 'mdi-checkbox-check-all' "
+                  color="black"
+                  size="small"
+                  :text="projectTask.stage === 'IN_PROGRESS' ? ' In Progress (' + projectTask.progress+ '% DONE)':
+             projectTask.stage === 'TO_DO' ? 'To Do' : 'Completed'"
+                  variant="outlined"
+              ></v-chip>
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-decagram"
+                  size="small"
+                  color="#1e90ff"
+                  :text="'Difficulty: ' + projectTask.difficulty"
+                  variant="outlined"
+              ></v-chip>
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-checkbox-blank-circle"
+                  color="green"
+                  size="small"
+                  text="Low Priority"
+                  v-if="projectTask.priority === 'LOW'"
+                  variant="outlined"
+              ></v-chip>
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-checkbox-blank-circle"
+                  color="orange"
+                  size="small"
+                  text="Medium Priority"
+                  v-if="projectTask.priority === 'MEDIUM'"
+                  variant="outlined"
+              ></v-chip>
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-checkbox-blank-circle"
+                  color="red"
+                  size="small"
+                  text="High Priority"
+                  v-if="projectTask.priority === 'HIGH'"
+                  variant="outlined"
+              ></v-chip>
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <v-chip
+                  class="bg-red-300 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+                  type="button" prepend-icon="mdi-delete" @click="removeTaskForProject(projectTask)">
+                Remove From Project
+              </v-chip>
+              <v-chip
+                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+                  type="button" prepend-icon="mdi-eye" @click="openTask(projectTask)">
+                Open Task
+              </v-chip>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
+        <div class="flex align-center">
+          <v-select
+              class="mt-5"
+              :items="addableTasks"
+              :item-title="item => item.name !== undefined ? item.name +' (Stage: '+ item.stage +' | Priority: ' + item.priority +')' : 'Choose a task'"
+              item-value="id"
+              label="Add New Task?"
+              v-model="toAddTask"
+          >
+          </v-select>
+          <v-btn
+              icon="mdi-plus"
+              class="bg-blue-400 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline ml-2"
+              v-if="toAddTask !== ''"
+              type="button" @click="addTaskForProject(toAddTask)"/>
         </div>
-        <div class="description_container2">
-          <div class="description2">
-            {{ project.description }}
-          </div>
-        </div>
-        <div class="project_properties">
-          <a class="font-bold ">Tasks:</a>
-          <div class="table_container">
-          <table class="table-auto w-full content-center">
-            <tbody class="text-center">
-            <tr v-for="projectTask in this.$store?.state?.projectTasks" :key="projectTask.id">
-              <td class="border px-4 py-2">{{ projectTask.name }}</td>
-              <td class="border px-4 py-2">STAGE: {{ projectTask.stage }}</td>
-              <td class="border px-4 py-2">PRIORITY: {{ projectTask.priority }}</td>
-              <td class="border px-4 py-2">
-                <button
-                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                    type="button" @click="removeTaskForProject(projectTask)">
-                  Remove from Project
-                </button>
-              </td>
-              <td class="border px-4 py-2">
-                <button
-                    class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                    type="button" @click="openTask(projectTask)">
-                  ...
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td class="border px-4 py-2">
-                <select
-                    class="resize-y overflow-auto shadow appearance-none border rounded w-full py-3 px-4 text-lg text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    id="description"  v-model="toAddTask">
-                  <option v-for="task in addableTasks"
-                          :key="task.id"
-                          :value="task">
-                    {{ task.name + ' ' + '(Stage: ' + task.stage + ' | Priority: ' + task.priority + ')'}}
-                  </option>
-                </select>
-              </td>
-              <td class="border px-4 py-2"
-                  v-if="toAddTask !== undefined && toAddTask !== '' && toAddTask !== null">
-                <button
-                    class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                    type="button" @click="addTaskForProject(toAddTask)">
-                  Add New Task?
-                </button>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-          </div>
-          <a class="font-bold ">Users:</a>
-          <table class="table-auto w-full content-center">
-            <tbody class="text-center">
-            <tr v-for="user in this.$store?.state?.projectUsers" :key="user.id">
-              <td class="border px-4 py-2">{{user.username }}</td>
-              <td class="border px-4 py-2">Email: {{ user.email }}</td>
-              <td class="border px-4 py-2">Full Name: {{ user.firstName + ' '+ user.lastName }}</td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
+        <v-card-title class="d-flex align-center pe-2">
+          <v-icon icon="mdi-account"></v-icon> &nbsp;
+          Users:
+        </v-card-title>
+        <v-expansion-panels>
+          <v-expansion-panel
+              v-for="user in this.$store?.state?.projectUsers"
+              :key="user.id"
+              :value="user"
+              :readonly="true"
+              :hide-actions="true"
+          >
+            <v-expansion-panel-title v-slot="{ expanded }">
+              <div>
+                <v-icon
+                    color="#1e90ff"
+                    class="mb-1"
+                    icon="mdi-account"
+                    start
+                ></v-icon>
+                {{ user.username }}
+              </div>
+              <v-spacer></v-spacer>
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-mail"
+                  size="small"
+                  color="#1e90ff"
+                  :text="user.email"
+                  variant="outlined"
+              ></v-chip>
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-account"
+                  color="green"
+                  size="small"
+                  :text="user.firstName+' '+user.lastName"
+                  variant="outlined"
+              ></v-chip>
+            </v-expansion-panel-title>
+          </v-expansion-panel>
+        </v-expansion-panels>
         <div class="flex items-end justify-end pt-3.5">
-          <button v-if="!this.$store?.state?.projectUsers.map(pUser => pUser.id).includes(this.$store?.state?.currentUser.id)"
-              class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+          <v-btn v-if="!this.$store?.state?.projectUsers.map(pUser => pUser.id).includes(this.$store?.state?.currentUser.id)"
+              class="mr-2 left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
               type="button" @click="enrollToProject">
             Enroll to Project
-          </button>
-          <button v-if="this.$store?.state?.projectUsers.map(pUser => pUser.id).includes(this.$store?.state?.currentUser.id)"
-                  class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+          </v-btn>
+          <v-btn v-if="this.$store?.state?.projectUsers.map(pUser => pUser.id).includes(this.$store?.state?.currentUser.id)"
+                  class="mr-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
                   type="button" @click="exitFromProject">
             Exit Project
-          </button>
-          <button
-              class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-              type="button" @click="removeProject(project.id)">
-            Delete
-          </button>
-          <button
+          </v-btn>
+          <v-btn
               class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
               type="button" @click="updateProject(project)">
             Update
-          </button>
+          </v-btn>
         </div>
-      </div>
+      </v-card>
       <div class="projectPage2nd">
-        <button
+        <v-btn
+            icon="mdi-close"
             class="h-10 left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-3xl focus:outline-none focus:shadow-outline"
-            type="button" @click="exitProject">
-          X
-        </button>
+            type="button" @click="exitProject"/>
       </div>
     </div>
   </div>
@@ -249,4 +325,7 @@ export default {
   overflow: auto; /* Add scrollbar when needed */
 }
 
+.beautifulShadow {
+  box-shadow: -17px 17px 7px 0px rgba(0, 0, 0, 0.13), 0px 1px 2px 0px rgba(0, 0, 0, 0.11);
+}
 </style>
