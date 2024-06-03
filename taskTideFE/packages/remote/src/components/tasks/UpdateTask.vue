@@ -144,6 +144,7 @@ export default {
         priority: this.updatePriority,
         stage: this.updateStage,
         progress: this.updateProgress,
+        userId: this.task.userId,
         projectId: this.task.projectId,
         deadline: this.task.deadline,
 

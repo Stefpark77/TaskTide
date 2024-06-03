@@ -27,9 +27,9 @@ export const getTaskByTaskId = async (taskId, token) => {
     }
 }
 
-export const getTaskByUserId = async (userId, token) => {
+export const getTaskByUserId = async (userId, projectIds, token) => {
     try {
-        return await axios.get(taskServicesURL + 'task/userId/' + userId, {
+        return await axios.post(taskServicesURL + 'task/userId/' + userId, projectIds, {
             headers: {
                 "Authorization": 'Bearer ' + token
             }

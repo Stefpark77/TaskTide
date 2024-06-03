@@ -49,6 +49,26 @@
              projectTask.stage === 'TO_DO' ? 'To Do' : 'Completed'"
                   variant="outlined"
               ></v-chip>
+
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-account"
+                  color="#1e90ff"
+                  size="small"
+                  :text="projectTask.user.firstName+' '+projectTask.user.lastName"
+                  v-if="projectTask.userId!==null && projectTask.user!==null && projectTask.user!==undefined"
+                  variant="outlined"
+              />
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-account"
+                  color="grey"
+                  size="small"
+                  text="No Assigned User"
+                  v-if="projectTask.userId===null"
+                  variant="outlined"
+              />
+
               <v-chip
                   class="ms-2 text-medium"
                   prepend-icon="mdi-decagram"
@@ -83,7 +103,10 @@
                   text="High Priority"
                   v-if="projectTask.priority === 'HIGH'"
                   variant="outlined"
-              ></v-chip>
+              />
+
+
+
             </v-expansion-panel-title>
             <v-expansion-panel-text>
               <v-chip
@@ -216,11 +239,6 @@ export default {
       this.$store?.commit('setShowProjects', true);
       this.$store?.commit('fetchProjects', true);
     },
-    removeProject(id) {
-      this.$store?.commit('removeProject', id);
-      this.$store?.commit('setShowProjectPage', false);
-      this.$store?.commit('setShowProjects', true);
-    },
     addTaskForProject(task) {
       this.$store?.commit('updateTaskForProject', {task: task, project: this.project});
       this.$store?.commit('setShowProjects', true);
@@ -238,6 +256,7 @@ export default {
       this.$store?.commit('removeProjectUser', {projectId: this.project.id});
     },
     openTask(task) {
+      task.project = this.project;
       this.$store?.commit('setTaskPage', task);
       this.$store?.commit('setShowProjectPage', false);
       this.$store?.commit('fetchTaskDependenciesByDependsOnId', task.id);

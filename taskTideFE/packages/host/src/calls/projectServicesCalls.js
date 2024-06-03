@@ -31,7 +31,7 @@ export const getProjectByProjectId = async (projectId, token) => {
 
 export const getProjectByUserId = async (userId, token) => {
     try {
-        const response = await axios.get(projectServicesURL + 'project/userId/' + userId,  {
+        const response = await axios.get(projectServicesURL + 'project-user/' + userId,  {
             headers: {
                 "Authorization": 'Bearer '+ token
             }});

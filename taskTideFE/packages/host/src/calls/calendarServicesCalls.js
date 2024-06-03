@@ -36,6 +36,19 @@ export const getEventsByUserId = async (userId, token) => {
         console.error(error);
     }
 }
+
+export const getEventsByUserIdAndDay = async (userId, day, token) => {
+    try {
+        return await axios.get(calendarServicesURL + 'event/userId/' + userId +'/day/' + day, {
+            headers: {
+                "Authorization": 'Bearer ' + token
+            }
+        });
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 export const deleteEvent = (eventId, token) => {
     try {
         return axios.delete(calendarServicesURL + 'event/?eventId=' + eventId, {

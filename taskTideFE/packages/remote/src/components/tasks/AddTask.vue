@@ -60,6 +60,7 @@
 export default {
   data() {
     return {
+      currentUser:  this.$store?.state?.currentUser ?? '',
       addName: this.$store?.state?.addName ?? '',
       addDescription: this.$store?.state?.addDescription ?? '',
       addDifficulty: this.$store?.state?.addDifficulty ?? '',
@@ -99,7 +100,7 @@ export default {
       this.addDifficulty = this.$store?.state?.addDifficulty ?? '';
     },
     addTask() {
-      this.$store?.commit('createTask', {name: this.addName, description: this.addDescription, difficulty: this.addDifficulty, priority: this.addPriority});
+      this.$store?.commit('createTask', {name: this.addName, description: this.addDescription, difficulty: this.addDifficulty, priority: this.addPriority, userId: this.currentUser.id,});
       this.$store?.commit('setShowAddTask', false);
       this.$store?.commit('setShowTasks', true);
     },

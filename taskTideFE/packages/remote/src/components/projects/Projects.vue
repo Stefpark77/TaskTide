@@ -2,19 +2,30 @@
   <div v-if="this.$store?.state?.showProjects">
     <div class="zone">
       <div class="flex justify-start bg-white">
-        <v-spacer></v-spacer>
         <v-tabs>
-          <v-tab
-              prepend-icon="mdi-file-document-plus-outline"
-              class="menu_button"
-              v-on:click="addProject">
-            New Project
-          </v-tab>
+          <v-text-field
+              class="ml-5 border-r-2 border-l-2"
+              width="300px"
+              prepend-inner-icon="mdi-magnify"
+              placeholder="Search By Name"
+              v-model="searchBar"
+          ></v-text-field>
         </v-tabs>
+        <v-spacer></v-spacer>
+        <v-spacer></v-spacer>
+          <v-spacer></v-spacer>
+          <v-tabs>
+            <v-tab
+                prepend-icon="mdi-file-document-plus-outline"
+                class="menu_button"
+                v-on:click="addProject">
+              New Project
+            </v-tab>
+          </v-tabs>
       </div>
       <div class="projects">
 
-        <v-card class="project" v-for="project in this.$store?.state?.projects" :key="project.id">
+        <v-card class="project" v-for="project in this.$store?.state?.projects.filter(p => searchBar === '' || p.name.includes(searchBar))" :key="project.id">
           <v-card-item>
             <v-card-title class="text-body-2 d-flex align-center ">
 
@@ -62,6 +73,7 @@ export default {
   data() {
     return {
       projects: this.$store?.state?.projects ?? [],
+      searchBar: '',
     };
   },
   methods: {

@@ -9,7 +9,7 @@ import {
     getEventByEventId,
     updateEvent,
     deleteEvent,
-    createEvent
+    createEvent, getEventsByUserIdAndDay
 } from "./calls/calendarServicesCalls";
 import {
     getAllUsers,
@@ -83,6 +83,14 @@ const store = createStore({
             token: '',
             /*calendar services*/
             events: [],
+            eventsWeek: [],
+            eventsMo: [],
+            eventsTu: [],
+            eventsWe: [],
+            eventsTh: [],
+            eventsFr: [],
+            eventsSa: [],
+            eventsSu: [],
             showEvents: false,
             showAddEvent: false,
             showEditEvent: false,
@@ -214,6 +222,35 @@ const store = createStore({
                 if (response.status !== 200) throw new Error('Failed to get events');
 
                 state.events = response.data;
+
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        async fetchWeekEvents(state, firstDay) {
+            try {
+                var curr;
+                var currentDate;
+                if (firstDay === null) {
+                    curr = new Date;
+                    const currentDay = curr.getDate() - curr.getDay() + 1;
+                    currentDate = new Date(curr.setDate(currentDay));
+                } else {
+                    currentDate= firstDay;
+                }
+                let index = 0;
+                while (index < 7) {
+
+                    const day = format(currentDate, "yyyy-MM-dd'T'HH:mm:ss'Z'");
+                    const response2 = await getEventsByUserIdAndDay(localStorage.getItem("userId"), day, localStorage.getItem("token"));
+                    checkAuth(response2);
+                    state.eventsWeek[index] = response2.data;
+
+                    currentDate = new Date(currentDate);
+                    currentDate.setDate(currentDate.getDate() + 1);
+
+                    index++;
+                }
             } catch (error) {
                 console.error(error);
             }
@@ -337,7 +374,16 @@ const store = createStore({
         },
         async fetchTasks(state) {
             try {
-                const response = await getTaskByUserId(localStorage.getItem("userId"), localStorage.getItem("token"));
+
+                const responseProjects = await getProjectByUserId(localStorage.getItem("userId"), localStorage.getItem("token"));
+
+                checkAuth(responseProjects);
+
+                if (responseProjects.status !== 200) throw new Error('Failed to get enrolled Projects');
+                var projectIds = responseProjects.data.map(projectUser => projectUser.projectId)
+
+
+                const response = await getTaskByUserId(localStorage.getItem("userId"), projectIds, localStorage.getItem("token"));
 
                 checkAuth(response);
 
@@ -345,17 +391,24 @@ const store = createStore({
 
                 state.tasks = response.data;
                 let updatedTasks = [];
-                for(let task of state.tasks){
-                    if(task.projectId!==null){
+                for (let task of state.tasks) {
+                    if (task.projectId !== null) {
                         const projectResponse = await getProjectByProjectId(task.projectId, localStorage.getItem("token"));
                         task.project = projectResponse.data;
-                    }else{
+                    } else {
                         task.project = null;
                     }
+                    if (task.userId !== null) {
+                        const userResponse = await getUserByUserId(task.userId, localStorage.getItem("token"));
+                        task.user = userResponse.data;
+                    } else {
+                        task.user = null;
+                    }
+
                     updatedTasks.push(task);
                 }
                 state.tasks = updatedTasks;
-                console.log( state.tasks);
+                console.log(state.tasks);
             } catch (error) {
                 console.error(error);
             }
@@ -382,6 +435,24 @@ const store = createStore({
                 if (response.status !== 200) throw new Error('Failed to get task by projectId');
 
                 state.projectTasks = response.data;
+
+                let updatedTasks = [];
+                for (let task of state.projectTasks) {
+                    if (task.projectId !== null) {
+                        const projectResponse = await getProjectByProjectId(task.projectId, localStorage.getItem("token"));
+                        task.project = projectResponse.data;
+                    } else {
+                        task.project = null;
+                    }
+                    if (task.userId !== null) {
+                        const userResponse = await getUserByUserId(task.userId, localStorage.getItem("token"));
+                        task.user = userResponse.data;
+                    } else {
+                        task.user = null;
+                    }
+                    updatedTasks.push(task);
+                }
+                state.projectTasks = updatedTasks;
             } catch (error) {
                 console.error(error);
             }
@@ -437,7 +508,7 @@ const store = createStore({
         async updateTask(state, task) {
             try {
                 console.log(task);
-                task.id = state.editTaskId;
+                task.id = state.task.id;
                 task.projectId = state.task.projectId;
 
                 const response = await updateTask(task, localStorage.getItem("token"));
@@ -445,10 +516,21 @@ const store = createStore({
                 checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to update task');
+                var updatedTask = response.data;
+                if (updatedTask.userId !== null) {
+                    const userResponse = await getUserByUserId(updatedTask.userId, localStorage.getItem("token"));
+                    updatedTask.user = userResponse.data;
+                } else {
+                    updatedTask.user = null;
+                }
+                if (updatedTask.projectId !== null) {
+                    const projectResponse = await getProjectByProjectId(updatedTask.projectId, localStorage.getItem("token"));
+                    updatedTask.project = projectResponse.data;
+                } else {
+                    updatedTask.project = null;
+                }
+                state.tasks = state.tasks.map(e => e.id === task.id ? updatedTask : e);
 
-                state.tasks = state.tasks.map(e => e.id === task.id ? response.data : e);
-
-                state.showEditTask = false;
             } catch (error) {
                 console.error(error);
             }
@@ -467,6 +549,26 @@ const store = createStore({
                 if (response.status !== 200) throw new Error('Failed to get task dependencies');
 
                 state.taskDependencies = response.data;
+                let updatedTasks = [];
+                for (let task of state.taskDependencies) {
+                    if (task.projectId !== null) {
+                        const projectResponse = await getProjectByProjectId(task.projectId, localStorage.getItem("token"));
+                        task.project = projectResponse.data;
+                    } else {
+                        task.project = null;
+                    }
+                    if (task.userId !== null) {
+                        const userResponse = await getUserByUserId(task.userId, localStorage.getItem("token"));
+                        task.user = userResponse.data;
+                    } else {
+                        task.user = null;
+                    }
+
+                    updatedTasks.push(task);
+                }
+                state.taskDependencies = updatedTasks;
+
+
                 console.log(state.taskDependencies);
             } catch (error) {
                 console.error(error);
@@ -481,6 +583,24 @@ const store = createStore({
                 if (response.status !== 200) throw new Error('Failed to get task dependencies');
 
                 state.taskDependenciesOn = response.data;
+                let updatedTasks = [];
+                for (let task of state.taskDependenciesOn) {
+                    if (task.projectId !== null) {
+                        const projectResponse = await getProjectByProjectId(task.projectId, localStorage.getItem("token"));
+                        task.project = projectResponse.data;
+                    } else {
+                        task.project = null;
+                    }
+                    if (task.userId !== null) {
+                        const userResponse = await getUserByUserId(task.userId, localStorage.getItem("token"));
+                        task.user = userResponse.data;
+                    } else {
+                        task.user = null;
+                    }
+
+                    updatedTasks.push(task);
+                }
+                state.taskDependenciesOn = updatedTasks;
                 console.log(state.taskDependenciesOn);
             } catch (error) {
                 console.error(error);
@@ -642,6 +762,19 @@ const store = createStore({
                 const response2 = await getTaskByProjectId(state.project.id, localStorage.getItem("token"));
                 checkAuth(response2);
                 if (response2.status !== 200) throw new Error('Failed to get tasks by projectId');
+
+                state.projectTasks = response.data;
+                let updatedTasks = [];
+                for (let task of state.projectTasks) {
+                    if (task.userId !== null) {
+                        const userResponse = await getUserByUserId(task.userId, localStorage.getItem("token"));
+                        task.user = userResponse.data;
+                    } else {
+                        task.user = null;
+                    }
+                    task.project = taskAndProject.project;
+                    updatedTasks.push(task);
+                }
                 state.projectTasks = response2.data;
 
 

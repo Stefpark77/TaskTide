@@ -22,6 +22,7 @@ export default {
   beforeCreate() {
     this.$store?.commit('prepareMenu', true);
     this.$store?.commit('fetchEvents', true);
+    this.$store?.commit('fetchWeekEvents', null);
     this.$store?.commit('fetchTasks', true);
     this.$store?.commit('fetchProjects', true);
     this.$store?.commit('setShowEvents', true);
@@ -29,6 +30,7 @@ export default {
   mounted() {
     this.$store?.commit('prepareMenu', true);
     this.$store?.commit('fetchEvents', true);
+    this.$store?.commit('fetchWeekEvents', null);
     this.$store?.commit('fetchTasks', true);
     this.$store?.commit('fetchProjects', true);
     this.$store?.commit('setShowEvents', true);

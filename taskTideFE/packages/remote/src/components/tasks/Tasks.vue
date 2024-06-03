@@ -11,35 +11,46 @@
                  value="ALL">
             All Tasks
           </v-tab>
-        <v-tab class="menu_button2"
-            prepend-icon="mdi-progress-helper"
-            value="TO_DO">
-          To Do
-        </v-tab>
-        <v-tab class="menu_button2"
-            prepend-icon="mdi-progress-check"
-            value="IN_PROGRESS">
-          In Progress
-        </v-tab>
-        <v-tab class="menu_button2"
-            prepend-icon="mdi-check-all"
-            value="COMPLETED">
-          Completed
-        </v-tab>
+          <v-tab class="menu_button2"
+                 prepend-icon="mdi-progress-helper"
+                 value="TO_DO">
+            To Do
+          </v-tab>
+          <v-tab class="menu_button2"
+                 prepend-icon="mdi-progress-check"
+                 value="IN_PROGRESS">
+            In Progress
+          </v-tab>
+          <v-tab class="menu_button2"
+                 prepend-icon="mdi-check-all"
+                 value="COMPLETED">
+            Completed
+          </v-tab>
         </v-tabs>
         <v-spacer></v-spacer>
+
+        <v-spacer></v-spacer>
         <v-tabs>
-        <v-tab
-            prepend-icon="mdi-file-document-plus-outline"
-            class="menu_button"
-            v-on:click="addTask">
-          New Task
-        </v-tab>
+
+          <v-text-field
+              class="ml-5 border-r-2 border-l-2 mr-20"
+              width="300px"
+              prepend-inner-icon="mdi-magnify"
+              placeholder="Search By Name"
+              v-model="searchBar"
+          ></v-text-field>
+          <v-tab
+              prepend-icon="mdi-file-document-plus-outline"
+              class="menu_button"
+              v-on:click="addTask">
+            New Task
+          </v-tab>
         </v-tabs>
       </div>
       <div class="tasks">
 
-        <v-card class="task" v-for="task in this.$store?.state?.tasks.filter(t => t.stage === currentStage || currentStage==='ALL')"
+        <v-card class="task"
+                v-for="task in this.$store?.state?.tasks.filter(t => (t.stage === currentStage || currentStage==='ALL') && (searchBar === '' || searchBar === undefined || t.name.includes(searchBar)))"
                 :key="task.id">
           <v-card-item>
             <v-card-title class="text-body-2 d-flex align-center ">
@@ -103,11 +114,6 @@
               </div>
             </div>
           </v-card-item>
-
-          <!--          <v-card-item class="deadlines flex-end">
-                      <a class="deadline_text"><a class="text-red-500">DEADLINE:</a>
-                        {{ format(parseISO(task.deadline), "MMMM dd, yyyy") }}</a>
-                    </v-card-item>-->
           <v-card-item>
             <v-chip
                 class="ms-2 mb-2 text-medium"
@@ -145,6 +151,26 @@
                 variant="outlined"
             ></v-chip>
 
+
+            <v-chip
+                class="ms-2 mb-2 text-medium"
+                prepend-icon="mdi-account"
+                color="#1e90ff"
+                size="small"
+                :text="task.user.firstName+' '+task.user.lastName"
+                v-if="task.userId!==null"
+                variant="outlined"
+            ></v-chip>
+            <v-chip
+                class="ms-2 mb-2 text-medium"
+                prepend-icon="mdi-account"
+                color="grey"
+                size="small"
+                text="No Assigned User"
+                v-if="task.userId===null"
+                variant="outlined"
+            ></v-chip>
+
             <v-chip
                 v-if="currentStage==='ALL'"
                 class="ms-2 mb-2 text-medium"
@@ -172,15 +198,12 @@ export default {
       tasks: this.$store?.state?.tasks ?? [],
       stages: ['TO_DO', 'IN_PROGRESS', 'COMPLETED'],
       currentStage: 'TO_DO',
+      searchBar: '',
     };
   },
   methods: {
     parseISO,
     format,
-    smartSort() {
-      this.$store?.commit('fetchTasks', true);
-      this.tasks = this.$store?.state?.tasks;
-    },
     addTask() {
       this.$store?.commit('setShowAddTask', true);
       this.$store?.commit('setShowTasks', false);
@@ -288,7 +311,7 @@ export default {
 }
 
 
-.menu_button2{
+.menu_button2 {
   background-color: white;
   padding: 10px 50px;
   font-weight: bold;

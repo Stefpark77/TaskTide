@@ -47,7 +47,7 @@ public class PrioritizationSorter {
         Set<String> visited = new HashSet<>();
         Stack<String> stack = new Stack<>();
 
-        // DFS traversal
+        // DFS
         List<EstimatedDeadlineTask> keys = new ArrayList<>(dependencyMap.keySet().stream().toList());
         keys.sort(COMPARISON_METHOD);
         for (EstimatedDeadlineTask task : keys) {
@@ -56,7 +56,6 @@ public class PrioritizationSorter {
             }
         }
 
-        // Pop from stack to get the topological order
         while (!stack.isEmpty()) {
             sortedTasks.add(stack.pop());
         }
@@ -69,9 +68,9 @@ public class PrioritizationSorter {
         visited.add(task.getTaskId());
 
         List<EstimatedDeadlineTask> dependencies = dependencyMap.getOrDefault(task, new ArrayList<>());
-        dependencies.sort(COMPARISON_METHOD);
+        dependencies.stream().filter(Objects::nonNull).collect(Collectors.toList()).sort(COMPARISON_METHOD);
         for (EstimatedDeadlineTask dependency : dependencies) {
-            if (!visited.contains(dependency.getTaskId())) {
+            if (dependency != null && !visited.contains(dependency.getTaskId())) {
                 topologicalSortUtil(dependency, dependencyMap, visited, stack);
             }
         }
@@ -109,7 +108,9 @@ public class PrioritizationSorter {
 
     }
 
-    private void updateEstimatedDeadlineForTask(EstimatedDeadlineTask currentTask, Map<String, List<String>> dependencyIdMap, Map<String, EstimatedDeadlineTask> estimatedTaskMap) {
+    private void updateEstimatedDeadlineForTask(EstimatedDeadlineTask currentTask,
+                                                Map<String, List<String>> dependencyIdMap,
+                                                Map<String, EstimatedDeadlineTask> estimatedTaskMap) {
         //check if we need to update the estimated deadline
         if (currentTask.getEstimatedDeadline() != null) {
             return;
@@ -123,12 +124,14 @@ public class PrioritizationSorter {
         for (String dependencyId : dependencyIds) {
             //get task from map
             EstimatedDeadlineTask dependency = estimatedTaskMap.get(dependencyId);
-            //make sure their estimated deadline exists
-            updateEstimatedDeadlineForTask(dependency, dependencyIdMap, estimatedTaskMap);
-            //update currentEstimatedDeadline
-            Instant estimatedTime = dependency.getEstimatedDeadline().minus(dependency.getDifficulty(), ChronoUnit.DAYS);
-            if (currentEstimatedDeadline == null || currentEstimatedDeadline.isAfter(estimatedTime)) {
-                currentEstimatedDeadline = estimatedTime;
+            if (dependency != null) {
+                //make sure their estimated deadline exists
+                updateEstimatedDeadlineForTask(dependency, dependencyIdMap, estimatedTaskMap);
+                //update currentEstimatedDeadline
+                Instant estimatedTime = dependency.getEstimatedDeadline().minus(dependency.getDifficulty(), ChronoUnit.DAYS);
+                if (currentEstimatedDeadline == null || currentEstimatedDeadline.isAfter(estimatedTime)) {
+                    currentEstimatedDeadline = estimatedTime;
+                }
             }
         }
         if (currentEstimatedDeadline == null) {

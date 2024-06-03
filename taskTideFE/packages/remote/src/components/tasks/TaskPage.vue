@@ -61,10 +61,25 @@
           ></v-chip>
         </v-card-title>
 
-        <a><b>PROJECT:</b> {{ task.projectId == null ? 'unassigned' : task.project.name }}</a>
+        <a>
+          <v-icon color="#1e90ff" icon="mdi-account"/>
+          <b> User:</b> {{ task.userId == null ? 'unassigned' : task.user.firstName + ' ' + task.user.lastName }}
+          <a class="switch_button" v-if="task.userId !== currentUser.id" v-on:click="updateUserTask(currentUser.id)">
+            ( Assign yourself? )
+          </a>
+          <a class="switch_button" v-if="task.userId === currentUser.id" v-on:click="updateUserTask(null)">
+            ( Unassign? )
+          </a>
+        </a>
+        <v-divider></v-divider>
+        <a>
+          <v-icon color="#1e90ff" icon="mdi-text-box-multiple-outline"/>
+          <b> PROJECT:</b> {{ task.projectId == null ? 'unassigned' : task.project.name }}</a>
         <v-divider></v-divider>
         <a v-if="task.projectId !== null && task.deadline !== null">
-          <a class="text-red-500"><b>DEADLINE:</b></a> {{ format(parseISO(task.deadline), "MMMM dd, yyyy") }} </a>
+          <a class="text-red-500">
+            <v-icon icon="mdi-calendar-clock-outline"/>
+            <b> DEADLINE:</b></a> {{ format(parseISO(task.deadline), "MMMM dd, yyyy") }} </a>
         <v-textarea class="mt-5" id="description" rows="10" min-width="500px" type="text" label="Description"
                     v-model="task.description" :readonly="true"/>
 
@@ -100,6 +115,26 @@
              taskDependency.stage === 'TO_DO' ? 'To Do' : 'Completed'"
                   variant="outlined"
               ></v-chip>
+
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-account"
+                  color="#1e90ff"
+                  size="small"
+                  :text="taskDependency.user.firstName+' '+taskDependency.user.lastName"
+                  v-if="taskDependency.userId!==null && taskDependency.user!==null && taskDependency.user!==undefined"
+                  variant="outlined"
+              />
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-account"
+                  color="grey"
+                  size="small"
+                  text="No Assigned User"
+                  v-if="taskDependency.userId===null"
+                  variant="outlined"
+              />
+
               <v-chip
                   class="ms-2 text-medium"
                   prepend-icon="mdi-decagram"
@@ -199,6 +234,27 @@
              taskDependency.stage === 'TO_DO' ? 'To Do' : 'Completed'"
                   variant="outlined"
               ></v-chip>
+
+
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-account"
+                  color="#1e90ff"
+                  size="small"
+                  :text="taskDependency.user.firstName+' '+taskDependency.user.lastName"
+                  v-if="taskDependency.userId!==null && taskDependency.user!==null && taskDependency.user!==undefined"
+                  variant="outlined"
+              />
+              <v-chip
+                  class="ms-2 text-medium"
+                  prepend-icon="mdi-account"
+                  color="grey"
+                  size="small"
+                  text="No Assigned User"
+                  v-if="taskDependency.userId===null"
+                  variant="outlined"
+              />
+
               <v-chip
                   class="ms-2 text-medium"
                   prepend-icon="mdi-decagram"
@@ -298,6 +354,7 @@ export default {
   data() {
     return {
       task: this.$store?.state?.task ?? '',
+      currentUser: this.$store?.state?.currentUser ?? '',
       token: this.$store?.state?.token,
       tasks: this.$store?.state?.tasks ?? [],
       taskDependencies: this.$store?.state?.taskDependencies ?? [],
@@ -340,6 +397,26 @@ export default {
       this.taskDependencies = this.$store?.state?.taskDependencies ?? [];
       this.taskDependenciesOn = this.$store?.state?.taskDependenciesOn ?? [];
     },
+    updateUserTask(userId) {
+      this.$store?.commit('updateTask', {
+        name: this.task.name,
+        description: this.task.description,
+        difficulty: this.task.difficulty,
+        priority: this.task.priority,
+        stage: this.task.stage,
+        progress: this.task.progress,
+        userId: userId,
+        projectId: this.task.projectId,
+        deadline: this.task.deadline,
+      });
+      if (userId == null) {
+        this.task.userId = null;
+      } else {
+        this.task.user = this.currentUser;
+        this.task.userId = this.currentUser.id;
+      }
+
+    }
   },
 };
 </script>
@@ -409,6 +486,18 @@ export default {
   padding: 20px;
   height: auto;
   margin-bottom: 1%;
+}
+
+.switch_button {
+  color: dodgerblue;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.switch_button:hover {
+  color: royalblue;
+  font-style: normal;
+  cursor: pointer;
 }
 
 .beautifulShadow {
