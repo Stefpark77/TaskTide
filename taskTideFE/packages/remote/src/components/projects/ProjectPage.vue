@@ -127,7 +127,7 @@
               class="mt-5"
               :items="addableTasks"
               :item-title="item => item.name !== undefined ? item.name +' (Stage: '+ item.stage +' | Priority: ' + item.priority +')' : 'Choose a task'"
-              item-value="id"
+              :item-value="item => item"
               label="Add New Task?"
               v-model="toAddTask"
           >
@@ -240,12 +240,14 @@ export default {
       this.$store?.commit('fetchProjects', true);
     },
     addTaskForProject(task) {
-      this.$store?.commit('updateTaskForProject', {task: task, project: this.project});
+      this.$store?.commit('updateTaskForProject', {task: task, project: this.project, projectId: this.project.id});
+      this.toAddTask=null;
       this.$store?.commit('setShowProjects', true);
       this.$store?.commit('fetchProjects', true);
     },
     removeTaskForProject(task) {
-      this.$store?.commit('updateTaskForProject', {task: task, project: {id:null, deadline:null}});
+      this.$store?.commit('updateTaskForProject', {task: task, project: {id:null, deadline:null}, projectId: this.project.id});
+      this.toAddTask=null;
       this.$store?.commit('setShowProjects', true);
       this.$store?.commit('fetchProjects', true);
     },
@@ -294,6 +296,8 @@ export default {
   padding-top: 1.5rem; /* equivalent to pt-6 */
   padding-bottom: 2rem; /* equivalent to pb-8 */
   margin-bottom: 1rem; /* equivalent to mb-4 */
+  max-height: 95%;
+  overflow: auto;
 }
 
 .projectPage2nd {

@@ -130,17 +130,17 @@ export default {
   position: absolute;
   background-color: lightsteelblue;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr)); /* Adjust the minimum and maximum width of each column */
-  gap: 100px; /* Adjust the gap between cards */
+  grid-template-columns: repeat(auto-fill, minmax(700px, 1fr)); /* Adjust the minimum and maximum width of each column */
+  gap: 0px; /* Adjust the gap between cards */
   overflow: auto; /* Add scrollbar when needed */
 }
 
 .project {
-  width: 400px; /* Adjust the width of your card */
+  width: 500px; /* Adjust the width of your card */
   height: 300px; /* Adjust the height of your card */
   margin-top: 100px;
   margin-right: 150px; /* Adjust the margin between cards */
-  margin-left: 150px; /* Adjust the margin between cards */
+  margin-left: 120px; /* Adjust the margin between cards */
   border: 1px solid #ccc;
   border-radius: 25px;
   box-shadow: -17px 17px 7px 0px rgba(0, 0, 0, 0.13), 0px 1px 2px 0px rgba(0, 0, 0, 0.11);

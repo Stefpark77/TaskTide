@@ -97,7 +97,7 @@ export default {
   methods: {
     estimateDifficulty() {
       this.$store?.commit('estimateDifficulty', {text: this.addDescription});
-      this.addDifficulty = this.$store?.state?.addDifficulty ?? '';
+      this.addDifficulty = this.$store?.state?.addDifficulty;
     },
     addTask() {
       this.$store?.commit('createTask', {name: this.addName, description: this.addDescription, difficulty: this.addDifficulty, priority: this.addPriority, userId: this.currentUser.id,});

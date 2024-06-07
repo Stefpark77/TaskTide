@@ -46,11 +46,11 @@ public class TaskController {
     }
 
 
-    @GetMapping("/userId/{userId}")
+    @PostMapping("/userId/{userId}")
     @PreAuthorize("hasAnyAuthority({'userRead', 'adminRead'})")
-    public List<Task> getTasksByUserId(@PathVariable String userId) {
+    public List<Task> getTasksByUserId(@PathVariable String userId, @RequestBody(required = false) List<String> projectIds) {
         log.info("getTasksByUserId: {}", userId);
-        return taskService.getTasksByUserId(userId);
+        return taskService.getTasksByUserId(userId, projectIds);
     }
 
     @GetMapping("/projectId/{projectId}")

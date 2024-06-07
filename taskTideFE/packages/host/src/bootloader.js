@@ -82,15 +82,7 @@ const store = createStore({
             addEmail: '',
             token: '',
             /*calendar services*/
-            events: [],
             eventsWeek: [],
-            eventsMo: [],
-            eventsTu: [],
-            eventsWe: [],
-            eventsTh: [],
-            eventsFr: [],
-            eventsSa: [],
-            eventsSu: [],
             showEvents: false,
             showAddEvent: false,
             showEditEvent: false,
@@ -199,7 +191,13 @@ const store = createStore({
         },
         async prepareMenu(state) {
             try {
-                const response = await getUserByUserId(localStorage.getItem("userId"), localStorage.getItem("token"));
+                if(state.token===''){
+                    state.token = localStorage.getItem("token");
+                }
+                if(state.currentUser===''){
+                    state.currentUser= {id: localStorage.getItem("userId")}
+                }
+                const response = await getUserByUserId(state.currentUser.id, state.token);
 
                 checkAuth(response);
 
@@ -211,24 +209,15 @@ const store = createStore({
             }
 
         },
-
         /*Calendar Services*/
-        async fetchEvents(state) {
-            try {
-                const response = await getEventsByUserId(localStorage.getItem("userId"), localStorage.getItem("token"));
-                state.token = localStorage.getItem("token");
-                checkAuth(response);
-
-                if (response.status !== 200) throw new Error('Failed to get events');
-
-                state.events = response.data;
-
-            } catch (error) {
-                console.error(error);
-            }
-        },
         async fetchWeekEvents(state, firstDay) {
             try {
+                if(state.token===''){
+                    state.token = localStorage.getItem("token");
+                }
+                if(state.currentUser===''){
+                    state.currentUser = {id: localStorage.getItem("userId")}
+                }
                 var curr;
                 var currentDate;
                 if (firstDay === null) {
@@ -240,15 +229,12 @@ const store = createStore({
                 }
                 let index = 0;
                 while (index < 7) {
-
                     const day = format(currentDate, "yyyy-MM-dd'T'HH:mm:ss'Z'");
-                    const response2 = await getEventsByUserIdAndDay(localStorage.getItem("userId"), day, localStorage.getItem("token"));
+                    const response2 = await getEventsByUserIdAndDay(state.currentUser.id, day, state.token);
                     checkAuth(response2);
                     state.eventsWeek[index] = response2.data;
-
                     currentDate = new Date(currentDate);
                     currentDate.setDate(currentDate.getDate() + 1);
-
                     index++;
                 }
             } catch (error) {
@@ -257,13 +243,12 @@ const store = createStore({
         },
         async removeEvent(state, eventId) {
             try {
-                const response = await deleteEvent(eventId, localStorage.getItem("token"));
+                const response = await deleteEvent(eventId, state.token);
 
                 checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to delete event');
-
-                state.events = state.events.filter(event => event.id !== eventId);
+                await this.commit("fetchWeekEvents", null)
             } catch (error) {
                 console.error(error);
             }
@@ -288,16 +273,16 @@ const store = createStore({
                     delete event.fullDay;
                 }
 
-                event.userId = localStorage.getItem("userId")
+                event.userId = state.currentUser.id
                 console.log(event);
 
-                const response = await createEvent(event, localStorage.getItem("token"));
+                const response = await createEvent(event, state.token);
 
                 checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to create event');
+                await this.commit("fetchWeekEvents", null)
 
-                state.events.push(response.data);
             } catch (error) {
                 console.error(error);
             }
@@ -339,19 +324,17 @@ const store = createStore({
                     delete event.fullDay;
                 }
 
-                event.userId = localStorage.getItem("userId")
+                event.userId = state.currentUser.id
 
                 console.log(event);
 
-                const response = await updateEvent(event, localStorage.getItem("token"));
+                const response = await updateEvent(event, state.token);
 
                 checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to update event');
-
-                state.events = state.events.map(e => e.id === event.id ? response.data : e);
-
                 state.showEditEvent = false;
+                await this.commit("fetchWeekEvents", null)
             } catch (error) {
                 console.error(error);
             }
@@ -361,7 +344,7 @@ const store = createStore({
 
         async fetchAllTasks(state) {
             try {
-                const response = await getAllTasks(localStorage.getItem("token"));
+                const response = await getAllTasks(state.token);
 
                 checkAuth(response);
 
@@ -374,8 +357,13 @@ const store = createStore({
         },
         async fetchTasks(state) {
             try {
-
-                const responseProjects = await getProjectByUserId(localStorage.getItem("userId"), localStorage.getItem("token"));
+                if(state.token===''){
+                    state.token = localStorage.getItem("token");
+                }
+                if(state.currentUser===''){
+                    state.currentUser= {id: localStorage.getItem("userId")}
+                }
+                const responseProjects = await getProjectByUserId(state.currentUser.id, state.token);
 
                 checkAuth(responseProjects);
 
@@ -383,7 +371,7 @@ const store = createStore({
                 var projectIds = responseProjects.data.map(projectUser => projectUser.projectId)
 
 
-                const response = await getTaskByUserId(localStorage.getItem("userId"), projectIds, localStorage.getItem("token"));
+                const response = await getTaskByUserId(state.currentUser.id, projectIds, state.token);
 
                 checkAuth(response);
 
@@ -393,29 +381,27 @@ const store = createStore({
                 let updatedTasks = [];
                 for (let task of state.tasks) {
                     if (task.projectId !== null) {
-                        const projectResponse = await getProjectByProjectId(task.projectId, localStorage.getItem("token"));
+                        const projectResponse = await getProjectByProjectId(task.projectId, state.token);
                         task.project = projectResponse.data;
                     } else {
                         task.project = null;
                     }
                     if (task.userId !== null) {
-                        const userResponse = await getUserByUserId(task.userId, localStorage.getItem("token"));
+                        const userResponse = await getUserByUserId(task.userId, state.token);
                         task.user = userResponse.data;
                     } else {
                         task.user = null;
                     }
-
                     updatedTasks.push(task);
                 }
                 state.tasks = updatedTasks;
-                console.log(state.tasks);
             } catch (error) {
                 console.error(error);
             }
         },
         async fetchTaskByTaskId(state, taskId) {
             try {
-                const response = await getTaskByTaskId(localStorage.getItem("taskId"), localStorage.getItem("token"));
+                const response = await getTaskByTaskId(localStorage.getItem("taskId"), state.token);
 
                 checkAuth(response);
 
@@ -428,7 +414,7 @@ const store = createStore({
         },
         async fetchTaskByProjectId(state, projectId) {
             try {
-                const response = await getTaskByProjectId(projectId, localStorage.getItem("token"));
+                const response = await getTaskByProjectId(projectId, state.token);
 
                 checkAuth(response);
 
@@ -439,13 +425,13 @@ const store = createStore({
                 let updatedTasks = [];
                 for (let task of state.projectTasks) {
                     if (task.projectId !== null) {
-                        const projectResponse = await getProjectByProjectId(task.projectId, localStorage.getItem("token"));
+                        const projectResponse = await getProjectByProjectId(task.projectId, state.token);
                         task.project = projectResponse.data;
                     } else {
                         task.project = null;
                     }
                     if (task.userId !== null) {
-                        const userResponse = await getUserByUserId(task.userId, localStorage.getItem("token"));
+                        const userResponse = await getUserByUserId(task.userId, state.token);
                         task.user = userResponse.data;
                     } else {
                         task.user = null;
@@ -459,7 +445,7 @@ const store = createStore({
         },
         async removeTask(state, taskId) {
             try {
-                const response = await deleteTask(taskId, localStorage.getItem("token"));
+                const response = await deleteTask(taskId, state.token);
 
                 checkAuth(response);
 
@@ -473,16 +459,18 @@ const store = createStore({
         async createTask(state, task) {
             console.log(task);
             try {
-                task.userId = localStorage.getItem("userId")
+                task.userId = state.currentUser.id
                 console.log(task);
 
-                const response = await createTask(task, localStorage.getItem("token"));
+                const response = await createTask(task, state.token);
 
                 checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to create task');
+                var taskResponse = response.data;
+                taskResponse.user = state.currentUser;
 
-                state.tasks.push(response.data);
+                state.tasks.push(taskResponse);
             } catch (error) {
                 console.error(error);
             }
@@ -511,20 +499,20 @@ const store = createStore({
                 task.id = state.task.id;
                 task.projectId = state.task.projectId;
 
-                const response = await updateTask(task, localStorage.getItem("token"));
+                const response = await updateTask(task, state.token);
 
                 checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to update task');
                 var updatedTask = response.data;
                 if (updatedTask.userId !== null) {
-                    const userResponse = await getUserByUserId(updatedTask.userId, localStorage.getItem("token"));
+                    const userResponse = await getUserByUserId(updatedTask.userId, state.token);
                     updatedTask.user = userResponse.data;
                 } else {
                     updatedTask.user = null;
                 }
                 if (updatedTask.projectId !== null) {
-                    const projectResponse = await getProjectByProjectId(updatedTask.projectId, localStorage.getItem("token"));
+                    const projectResponse = await getProjectByProjectId(updatedTask.projectId, state.token);
                     updatedTask.project = projectResponse.data;
                 } else {
                     updatedTask.project = null;
@@ -542,7 +530,7 @@ const store = createStore({
         /*TaskDependency Services*/
         async fetchTaskDependenciesByTaskId(state, taskId) {
             try {
-                const response = await getTaskDependencyByTaskId(taskId, localStorage.getItem("token"));
+                const response = await getTaskDependencyByTaskId(taskId, state.token);
 
                 checkAuth(response);
 
@@ -552,13 +540,13 @@ const store = createStore({
                 let updatedTasks = [];
                 for (let task of state.taskDependencies) {
                     if (task.projectId !== null) {
-                        const projectResponse = await getProjectByProjectId(task.projectId, localStorage.getItem("token"));
+                        const projectResponse = await getProjectByProjectId(task.projectId, state.token);
                         task.project = projectResponse.data;
                     } else {
                         task.project = null;
                     }
                     if (task.userId !== null) {
-                        const userResponse = await getUserByUserId(task.userId, localStorage.getItem("token"));
+                        const userResponse = await getUserByUserId(task.userId, state.token);
                         task.user = userResponse.data;
                     } else {
                         task.user = null;
@@ -567,16 +555,13 @@ const store = createStore({
                     updatedTasks.push(task);
                 }
                 state.taskDependencies = updatedTasks;
-
-
-                console.log(state.taskDependencies);
             } catch (error) {
                 console.error(error);
             }
         },
         async fetchTaskDependenciesByDependsOnId(state, dependsOnId) {
             try {
-                const response = await getTaskDependencyByDependsOnId(dependsOnId, localStorage.getItem("token"));
+                const response = await getTaskDependencyByDependsOnId(dependsOnId, state.token);
 
                 checkAuth(response);
 
@@ -586,13 +571,13 @@ const store = createStore({
                 let updatedTasks = [];
                 for (let task of state.taskDependenciesOn) {
                     if (task.projectId !== null) {
-                        const projectResponse = await getProjectByProjectId(task.projectId, localStorage.getItem("token"));
+                        const projectResponse = await getProjectByProjectId(task.projectId, state.token);
                         task.project = projectResponse.data;
                     } else {
                         task.project = null;
                     }
                     if (task.userId !== null) {
-                        const userResponse = await getUserByUserId(task.userId, localStorage.getItem("token"));
+                        const userResponse = await getUserByUserId(task.userId, state.token);
                         task.user = userResponse.data;
                     } else {
                         task.user = null;
@@ -601,28 +586,20 @@ const store = createStore({
                     updatedTasks.push(task);
                 }
                 state.taskDependenciesOn = updatedTasks;
-                console.log(state.taskDependenciesOn);
             } catch (error) {
                 console.error(error);
             }
         },
         async removeTaskDependency(state, dependency) {
             try {
-                const response = await deleteTaskDependency(dependency.taskId, dependency.dependsOnId, localStorage.getItem("token"));
+                const response = await deleteTaskDependency(dependency.taskId, dependency.dependsOnId, state.token);
 
                 checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to delete task dependency');
+                await this.commit("fetchTaskDependenciesByDependsOnId",state.task.id)
+                await this.commit("fetchTaskDependenciesByTaskId",state.task.id)
 
-                const response2 = await getTaskDependencyByDependsOnId(state.task.id, localStorage.getItem("token"));
-                checkAuth(response2);
-                if (response2.status !== 200) throw new Error('Failed to get task dependencies');
-                state.taskDependenciesOn = response2.data;
-
-                const response3 = await getTaskDependencyByTaskId(state.task.id, localStorage.getItem("token"));
-                checkAuth(response3);
-                if (response3.status !== 200) throw new Error('Failed to get task dependencies');
-                state.taskDependencies = response3.data;
 
             } catch (error) {
                 console.error(error);
@@ -630,21 +607,14 @@ const store = createStore({
         },
         async createTaskDependency(state, dependency) {
             try {
-                const response = await createTaskDependency(dependency, localStorage.getItem("token"));
+                const response = await createTaskDependency(dependency, state.token);
 
                 checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to create task dependency');
+                await this.commit("fetchTaskDependenciesByDependsOnId",state.task.id)
+                await this.commit("fetchTaskDependenciesByTaskId",state.task.id)
 
-                const response2 = await getTaskDependencyByDependsOnId(state.task.id, localStorage.getItem("token"));
-                checkAuth(response2);
-                if (response2.status !== 200) throw new Error('Failed to get task dependencies');
-                state.taskDependenciesOn = response2.data;
-
-                const response3 = await getTaskDependencyByTaskId(state.task.id, localStorage.getItem("token"));
-                checkAuth(response3);
-                if (response3.status !== 200) throw new Error('Failed to get task dependencies');
-                state.taskDependencies = response3.data;
             } catch (error) {
                 console.error(error);
             }
@@ -652,7 +622,7 @@ const store = createStore({
 
         async estimateDifficulty(state, description) {
             try {
-                const response = await getEstimatedDifficulty(description, localStorage.getItem("token"));
+                const response = await getEstimatedDifficulty(description, state.token);
 
                 checkAuth(response);
 
@@ -668,8 +638,11 @@ const store = createStore({
 
         /*Project Services*/
         async fetchProjects(state) {
+            if(state.token===''){
+                state.token = localStorage.getItem("token");
+            }
             try {
-                const response = await getAllProjects(localStorage.getItem("token"));
+                const response = await getAllProjects(state.token);
 
                 checkAuth(response);
 
@@ -681,7 +654,7 @@ const store = createStore({
         },
         async removeProject(state, projectId) {
             try {
-                const response = await deleteProject(projectId, localStorage.getItem("token"));
+                const response = await deleteProject(projectId, state.token);
 
                 checkAuth(response);
 
@@ -697,10 +670,7 @@ const store = createStore({
             try {
                 const dateObject = parseISO(project.deadline);
                 project.deadline = format(dateObject, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
-                /*TODO create user project connection
-                project.userId = localStorage.getItem("userId")*/
-
-                const response = await createProject(project, localStorage.getItem("token"));
+                const response = await createProject(project, state.token);
 
                 checkAuth(response);
 
@@ -731,7 +701,7 @@ const store = createStore({
 
                 console.log(project);
 
-                const response = await updateProject(project, localStorage.getItem("token"));
+                const response = await updateProject(project, state.token);
 
                 checkAuth(response);
 
@@ -753,38 +723,18 @@ const store = createStore({
                 taskAndProject.task.projectId = taskAndProject.project.id;
                 taskAndProject.task.deadline = taskAndProject.project.deadline;
                 console.log(taskAndProject.task);
-                const response = await updateTask(taskAndProject.task, localStorage.getItem("token"));
-
+                const response = await updateTask(taskAndProject.task, state.token);
                 checkAuth(response);
-
                 if (response.status !== 200) throw new Error('Failed to update task');
-
-                const response2 = await getTaskByProjectId(state.project.id, localStorage.getItem("token"));
-                checkAuth(response2);
-                if (response2.status !== 200) throw new Error('Failed to get tasks by projectId');
-
-                state.projectTasks = response.data;
-                let updatedTasks = [];
-                for (let task of state.projectTasks) {
-                    if (task.userId !== null) {
-                        const userResponse = await getUserByUserId(task.userId, localStorage.getItem("token"));
-                        task.user = userResponse.data;
-                    } else {
-                        task.user = null;
-                    }
-                    task.project = taskAndProject.project;
-                    updatedTasks.push(task);
-                }
-                state.projectTasks = response2.data;
-
-
+                await this.commit("fetchTaskByProjectId", taskAndProject.projectId);
+                await this.commit('fetchAllTasks', true);
             } catch (error) {
                 console.error(error);
             }
         },
         async fetchUsersForProject(state, projectId) {
             try {
-                const response = await getUserByProjectId(projectId, localStorage.getItem("token"));
+                const response = await getUserByProjectId(projectId, state.token);
 
                 checkAuth(response);
 
@@ -797,13 +747,13 @@ const store = createStore({
         },
         async removeProjectUser(state, projectUser) {
             try {
-                const response = await deleteProjectUser(projectUser.projectId, state.currentUser.id, localStorage.getItem("token"));
+                const response = await deleteProjectUser(projectUser.projectId, state.currentUser.id, state.token);
 
                 checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to delete project user connection');
 
-                const response2 = await getUserByProjectId(projectUser.projectId, localStorage.getItem("token"));
+                const response2 = await getUserByProjectId(projectUser.projectId, state.token);
                 checkAuth(response2);
                 if (response2.status !== 200) throw new Error('Failed to get project users');
                 state.projectUsers = response2.data;
@@ -815,13 +765,13 @@ const store = createStore({
         async createProjectUser(state, projectUser) {
             try {
                 projectUser.userId = state.currentUser.id;
-                const response = await createProjectUser(projectUser, localStorage.getItem("token"));
+                const response = await createProjectUser(projectUser, state.token);
 
                 checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to create project user connection');
 
-                const response2 = await getUserByProjectId(projectUser.projectId, localStorage.getItem("token"));
+                const response2 = await getUserByProjectId(projectUser.projectId, state.token);
                 checkAuth(response2);
                 if (response2.status !== 200) throw new Error('Failed to get project users');
                 state.projectUsers = response2.data;

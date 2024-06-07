@@ -55,14 +55,15 @@
           <v-card-item>
             <v-card-title class="text-body-2 d-flex align-center ">
 
-              <div class="text-h6"><a class="font-bold">
+              <div class="text-h6 "><a class="font-bold">
                 <v-icon
                     color="#1e90ff"
                     class="mb-1"
                     icon="mdi-checkbox-blank-outline"
                     start
                 ></v-icon>
-                {{ task.name }}</a></div>
+                {{ task.name.length >30 ? task.name.slice(0, 30) + '..' : task.name }}
+              </a></div>
               <v-spacer></v-spacer>
 
               <v-chip
@@ -70,7 +71,7 @@
                   prepend-icon="mdi-checkbox-blank-circle"
                   color="green"
                   size="small"
-                  text="Low Priority"
+                  text="Low"
                   v-if="task.priority === 'LOW'"
                   variant="outlined"
               ></v-chip>
@@ -80,7 +81,7 @@
                   prepend-icon="mdi-checkbox-blank-circle"
                   color="orange"
                   size="small"
-                  text="Medium Priority"
+                  text="Medium"
                   v-if="task.priority === 'MEDIUM'"
                   variant="outlined"
               ></v-chip>
@@ -90,7 +91,7 @@
                   prepend-icon="mdi-checkbox-blank-circle"
                   color="red"
                   size="small"
-                  text="High Priority"
+                  text="High"
                   v-if="task.priority === 'HIGH'"
                   variant="outlined"
               ></v-chip>
@@ -110,7 +111,7 @@
               <div class="text-h6 border-b-2"><a class="font-bold"></a></div>
 
               <div class="font-weight-light text-medium-emphasis">
-                {{ task.description.length > 255 ? task.description.slice(0, 255) + '...' : task.description }}
+                {{ task.description.length > 450 ? task.description.slice(0, 450) + '...' : task.description }}
               </div>
             </div>
           </v-card-item>
@@ -158,7 +159,7 @@
                 color="#1e90ff"
                 size="small"
                 :text="task.user.firstName+' '+task.user.lastName"
-                v-if="task.userId!==null"
+                v-if="task.userId!==null && task.user!==undefined"
                 variant="outlined"
             ></v-chip>
             <v-chip
@@ -288,17 +289,17 @@ export default {
   position: absolute;
   background-color: lightsteelblue;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(600px, 1fr)); /* Adjust the minimum and maximum width of each column */
-  gap: -50px; /* Adjust the gap between cards */
+  grid-template-columns: repeat(auto-fill, minmax(660px, 1fr)); /* Adjust the minimum and maximum width of each column */
+  gap: -25px; /* Adjust the gap between cards */
   overflow: auto; /* Add scrollbar when needed */
 }
 
 .task {
-  width: 500px; /* Adjust the width of your card */
+  width: 600px; /* Adjust the width of your card */
   height: 400px; /* Adjust the height of your card */
   margin-top: 100px;
   margin-right: 150px; /* Adjust the margin between cards */
-  margin-left: 150px; /* Adjust the margin between cards */
+  margin-left: 120px; /* Adjust the margin between cards */
   border: 1px solid #ccc;
   border-radius: 25px;
   box-shadow: -17px 17px 7px 0px rgba(0, 0, 0, 0.13), 0px 1px 2px 0px rgba(0, 0, 0, 0.11);
@@ -321,5 +322,8 @@ export default {
   color: black;
   margin-up: 10%;
   margin-bottom: 50%;
+}
+.test{
+  width: 10px;
 }
 </style>

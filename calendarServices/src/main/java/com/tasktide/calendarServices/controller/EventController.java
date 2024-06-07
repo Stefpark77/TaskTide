@@ -3,11 +3,11 @@ package com.tasktide.calendarServices.controller;
 import com.tasktide.calendarServices.model.Event;
 import com.tasktide.calendarServices.service.EventService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -34,6 +34,13 @@ public class EventController {
     public List<Event> getEventsByUserId(@PathVariable String userId) {
         return eventService.getEventsByUserId(userId);
     }
+
+    @GetMapping("/userId/{userId}/day/{day}")
+    @PreAuthorize("hasAnyAuthority({'userRead', 'adminRead'})")
+    public List<Event> getEventsByUserIdAndDay(@PathVariable String userId,@PathVariable Instant day) {
+        return eventService.getEventsByUserIdAndDay(userId, day);
+    }
+
 
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority({'userRead', 'adminRead'})")

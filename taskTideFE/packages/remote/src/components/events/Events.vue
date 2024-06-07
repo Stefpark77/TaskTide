@@ -18,7 +18,7 @@
               v-on:click="previousWeek"><v-icon icon="mdi-arrow-left-bold-circle-outline"/>PREVIOUS Week</v-btn>
           <v-tab
               prepend-icon="mdi-calendar"
-              class="menu_button"
+              class="tab_week"
               readonly>
             {{ format(firstDayOfWeek, "MMMM dd, yyyy") }}
             <v-icon icon="mdi-arrow-right"/>
@@ -170,11 +170,13 @@ export default {
     addEvent() {
       this.$store?.commit('setShowAddEvent', true);
       this.$store?.commit('setShowEvents', false);
+      this.numberOfWeeks=0;
     },
     updateEvent(event) {
       this.$store?.commit('setUpdateEvent', event);
       this.$store?.commit('setShowEditEvent', true);
       this.$store?.commit('setShowEvents', false);
+      this.numberOfWeeks=0;
     },
     previousWeek() {
       this.numberOfWeeks--;
@@ -224,9 +226,6 @@ export default {
       }
       return format(parseISO(event.date), "HH:mm");
     },
-    test(smth){
-      console.log(smth);
-    }
     },
 };
 </script>
@@ -304,6 +303,18 @@ export default {
   flex-direction: column;
   align-content: stretch;
   justify-content: space-between;
+}
+
+.tab_week{
+  background-color: white;
+  padding: 10px 50px;
+  font-weight: bold;
+  border-radius: 35px;
+  justify-content: center;
+  font-size: large;
+  color: black;
+  margin-up: 10%;
+  margin-bottom: 50%;
 }
 
 .white-bar {

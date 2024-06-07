@@ -6,6 +6,7 @@ import com.tasktide.taskServices.util.PrioritizationSorter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,15 +26,25 @@ public class TaskService {
         return taskRepository.findTaskById(taskId);
     }
 
-    public List<Task> getTasksByUserId(String userId) {
-        return prioritizationSorter.sortByPrioritizationTasks(taskRepository.findTasksByUserId(userId));
+    public List<Task> getTasksByUserId(String userId, List<String> projectIds) {
+        List<Task> assignedTasks = taskRepository.findTasksByUserId(userId);
+        List<Task> projectTasks = new ArrayList<>();
+        if (projectIds != null) {
+            projectTasks = projectIds.stream().flatMap(projectId -> getTasksByProjectId(projectId).stream()).toList();
+        }
+        assignedTasks.addAll(projectTasks);
+        List<Task> userTasks = assignedTasks.stream().distinct().toList();
+        return prioritizationSorter.sortByPrioritizationTasks(userTasks);
     }
+
     public List<Task> getTasksByProjectId(String projectId) {
         return taskRepository.findTasksByProjectId(projectId);
     }
+
     public List<Task> getAllTasks() {
         return taskRepository.findAllTasks();
     }
+
     public Task addNewTask(Task task) {
         return taskRepository.createTask(task);
     }

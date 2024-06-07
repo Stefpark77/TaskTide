@@ -55,8 +55,7 @@ public class TaskRepository {
             newTask.setPriority(task.getPriority());
         if(task.getStage() != null)
             newTask.setStage(task.getStage());
-        if(task.getUserId() != null)
-            newTask.setUserId(task.getUserId());
+        newTask.setUserId(task.getUserId());
         newTask.setProjectId(task.getProjectId());
         newTask.setUpdatedDate(Instant.now());
         iTaskRepository.save(newTask);

@@ -28,6 +28,7 @@ def get_wordnet_pos(tag):
     else:
         return wordnet.NOUN
 
+
 # Function to perform lemmatization
 def lemmatize_text(text):
     lemmatizer = WordNetLemmatizer()
@@ -38,10 +39,8 @@ def lemmatize_text(text):
     filtered_sentences2 = [w for w in filtered_sentences if not w.lower() in '.?!,']
     return ' '.join(filtered_sentences2)
 
-# Load the CSV file into a pd DataFrame
-df = pd.read_csv('trainData2.csv',  delimiter=';')
 
-# Apply lemmatization to the text data
+df = pd.read_csv('trainData2.csv',  delimiter=';')
 df['text_lemmatized'] = df['text'].apply(lemmatize_text)
 
 # Split the data into training and testing sets

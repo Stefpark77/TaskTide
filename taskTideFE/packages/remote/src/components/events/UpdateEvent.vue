@@ -70,7 +70,7 @@ export default {
           updateEndDate: this.$store?.state?.updateEndDate ?? '',
           fullDay: false,
           recurring: this.$store?.state?.updateRecurring ?? 'ONCE',
-          recurringValues: ['ONCE', 'WEEKLY', 'BIWEEKLY', 'MONTHLY', 'ANNUAL'],
+          recurringValues: ['ONCE','DAILY',  'WEEKLY', 'BIWEEKLY', 'MONTHLY', 'ANNUAL'],
         };
     },
     watch: {
