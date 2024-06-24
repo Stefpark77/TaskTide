@@ -4,17 +4,18 @@
       <v-card class="projectPage1st beautifulShadow">
         <v-card-title class="text-body-2 d-flex align-center border-b-2 mb-5 ">
 
-        <div class="text-h4"><a class="font-weight-bold">
-          <v-icon
-              color="#1e90ff"
-              class="mb-1"
-              icon="mdi-text-box-multiple-outline"
-              start
-          ></v-icon>
-          {{ project.name }}</a></div>
-        <v-spacer></v-spacer>
-        <a class="text-h5"><b class="text-red-500">DEADLINE: </b>{{ format(parseISO(project.deadline), "MMMM dd, yyyy") }}</a>
-      </v-card-title>
+          <div class="text-h4"><a class="font-weight-bold">
+            <v-icon
+                color="#1e90ff"
+                class="mb-1"
+                icon="mdi-text-box-multiple-outline"
+                start
+            ></v-icon>
+            {{ project.name }}</a></div>
+          <v-spacer></v-spacer>
+          <a class="text-h5"><b
+              class="text-red-500">DEADLINE: </b>{{ format(parseISO(project.deadline), "MMMM dd, yyyy") }}</a>
+        </v-card-title>
         <v-textarea class="mt-5" id="description" rows="10" min-width="500px" type="text" label="Description"
                     v-model="project.description" :readonly="true"/>
         <v-card-title class="d-flex align-center pe-2">
@@ -106,7 +107,6 @@
               />
 
 
-
             </v-expansion-panel-title>
             <v-expansion-panel-text>
               <v-chip
@@ -181,14 +181,16 @@
           </v-expansion-panel>
         </v-expansion-panels>
         <div class="flex items-end justify-end pt-3.5">
-          <v-btn v-if="!this.$store?.state?.projectUsers.map(pUser => pUser.id).includes(this.$store?.state?.currentUser.id)"
+          <v-btn
+              v-if="!this.$store?.state?.projectUsers.map(pUser => pUser.id).includes(this.$store?.state?.currentUser.id)"
               class="mr-2 left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
               type="button" @click="enrollToProject">
             Enroll to Project
           </v-btn>
-          <v-btn v-if="this.$store?.state?.projectUsers.map(pUser => pUser.id).includes(this.$store?.state?.currentUser.id)"
-                  class="mr-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                  type="button" @click="exitFromProject">
+          <v-btn
+              v-if="this.$store?.state?.projectUsers.map(pUser => pUser.id).includes(this.$store?.state?.currentUser.id)"
+              class="mr-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+              type="button" @click="exitFromProject">
             Exit Project
           </v-btn>
           <v-btn
@@ -209,11 +211,12 @@
 </template>
 <script>
 import {format, parseISO} from "date-fns";
+
 export default {
-  computed:{
+  computed: {
     addableTasks: function () {
       return this.$store?.state?.allTasks.filter(task => !this.$store?.state?.projectTasks.map(pTask => pTask.id).includes(task.id)
-          && task.projectId === null )
+          && task.projectId === null)
     },
   },
   data() {
@@ -241,13 +244,17 @@ export default {
     },
     addTaskForProject(task) {
       this.$store?.commit('updateTaskForProject', {task: task, project: this.project, projectId: this.project.id});
-      this.toAddTask=null;
+      this.toAddTask = null;
       this.$store?.commit('setShowProjects', true);
       this.$store?.commit('fetchProjects', true);
     },
     removeTaskForProject(task) {
-      this.$store?.commit('updateTaskForProject', {task: task, project: {id:null, deadline:null}, projectId: this.project.id});
-      this.toAddTask=null;
+      this.$store?.commit('updateTaskForProject', {
+        task: task,
+        project: {id: null, deadline: null},
+        projectId: this.project.id
+      });
+      this.toAddTask = null;
       this.$store?.commit('setShowProjects', true);
       this.$store?.commit('fetchProjects', true);
     },
@@ -306,46 +313,6 @@ export default {
   width: auto;
   height: 90%;
   padding: 3%;
-}
-
-.project_properties2 {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  border-top: gray 2px;
-}
-
-.description_container2 {
-  display: flex;
-  justify-content: space-evenly;
-  margin-bottom: 1%;
-  min-width: 90%;
-  min-height: 50%;
-  padding: 10px;
-  overflow: auto;
-}
-.table_container {
-  display: flex;
-  justify-content: space-evenly;
-  margin-bottom: 1%;
-  min-width: 90%;
-  padding: 10px;
-  max-height: 100px;
-  overflow: auto;
-}
-
-.description2 {
-  font-size: large;
-  display: flex;
-  justify-content: flex-start;
-  border: 1px solid #ccc;
-  border-radius: 25px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  padding: 20px;
-  height: auto;
-  margin-bottom: 1%;
-  overflow: auto; /* Add scrollbar when needed */
 }
 
 .beautifulShadow {

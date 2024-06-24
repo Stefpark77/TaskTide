@@ -5,8 +5,7 @@ import axios from "axios";
 export const getEstimatedDifficulty = (text) => {
     try {
         return axios.post(estimateDifficultyURL, text);
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }

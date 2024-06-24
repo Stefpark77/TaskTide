@@ -1,7 +1,7 @@
 <template>
   <div class="placement_start" v-if="!this.$store?.state?.showSignUp">
     <div class="left_image_login">
-      </div>
+    </div>
     <div class="right_size">
       <div class="placement_end">
         <div class="space_between">
@@ -91,16 +91,7 @@ export default {
   border-right: 10px solid gray;
   background-image: url("https://media.istockphoto.com/id/1363738494/photo/checking-off-a-to-do-list-on-a-clipboard-with-a-red-check-mark.jpg?s=612x612&w=0&k=20&c=UM_m3kG2TM5jcoNL2RFK4b5tABTsrjBaVC9SgzWasAc=");
 }
-.left_image_signup {
-  width: 50%;
-  height: 100%;
-  left: 0;
-  position: absolute;
-  background-color: red;
-  background-repeat: repeat;
-  border-right: 10px solid gray;
-  background-image: url("https://media.istockphoto.com/id/1469214984/photo/welcome-written-speech-bubble-and-blue-megaphone-on-blue-background.webp?b=1&s=170667a&w=0&k=20&c=uxjvmYQaojVUxMSxJBaunTYvp1g5Zuco1YMq55W6s2o=");
-}
+
 .right_size {
   position: absolute;
   width: 50%;

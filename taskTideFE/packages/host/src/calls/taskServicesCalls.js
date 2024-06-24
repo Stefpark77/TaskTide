@@ -8,8 +8,7 @@ export const getAllTasks = async (token) => {
                 'Authorization': 'Bearer ' + token
             }
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
@@ -21,8 +20,7 @@ export const getTaskByTaskId = async (taskId, token) => {
                 'Authorization': 'Bearer ' + token
             }
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
@@ -34,8 +32,7 @@ export const getTaskByUserId = async (userId, projectIds, token) => {
                 "Authorization": 'Bearer ' + token
             }
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
@@ -46,8 +43,7 @@ export const getTaskByProjectId = async (projectId, token) => {
                 "Authorization": 'Bearer ' + token
             }
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
@@ -58,8 +54,7 @@ export const deleteTask = (taskId, token) => {
                 'Authorization': 'Bearer ' + token
             }
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
@@ -71,8 +66,7 @@ export const createTask = (task, token) => {
                 'Authorization': 'Bearer ' + token
             }
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
@@ -84,8 +78,7 @@ export const updateTask = (task, token) => {
                 'Authorization': 'Bearer ' + token
             }
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
@@ -97,8 +90,7 @@ export const getTaskDependencyByTaskId = async (taskId, token) => {
                 "Authorization": 'Bearer ' + token
             }
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
@@ -110,8 +102,7 @@ export const getTaskDependencyByDependsOnId = async (dependsOnId, token) => {
                 "Authorization": 'Bearer ' + token
             }
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
@@ -122,8 +113,7 @@ export const deleteTaskDependency = (taskId, dependsOnId, token) => {
                 'Authorization': 'Bearer ' + token
             }
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
@@ -135,8 +125,7 @@ export const createTaskDependency = (dependency, token) => {
                 'Authorization': 'Bearer ' + token
             }
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }

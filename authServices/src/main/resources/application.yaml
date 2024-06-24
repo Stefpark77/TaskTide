@@ -22,7 +22,7 @@ rabbitmq:
   exchange:
     name: signup_exchange
   routing:
-    key:  signup_routing_key
+    key: signup_routing_key
 
 security:
   jwt:

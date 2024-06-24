@@ -13,27 +13,31 @@
         </v-tabs>
         <v-spacer></v-spacer>
         <v-spacer></v-spacer>
-          <v-spacer></v-spacer>
-          <v-tabs>
-            <v-tab
-                prepend-icon="mdi-file-document-plus-outline"
-                class="menu_button"
-                v-on:click="addProject">
-              New Project
-            </v-tab>
-          </v-tabs>
+        <v-spacer></v-spacer>
+        <v-tabs>
+          <v-tab
+              prepend-icon="mdi-file-document-plus-outline"
+              class="menu_button"
+              v-on:click="addProject">
+            New Project
+          </v-tab>
+        </v-tabs>
       </div>
       <div class="projects">
 
-        <v-card class="project" v-for="project in this.$store?.state?.projects.filter(p => searchBar === '' || p.name.includes(searchBar))" :key="project.id">
+        <v-card class="project"
+                v-for="project in this.$store?.state?.projects.filter(p => searchBar === '' || p.name.toLowerCase().includes(searchBar.toLowerCase()))"
+                :key="project.id">
           <v-card-item>
             <v-card-title class="text-body-2 d-flex align-center ">
 
-              <div class="text-h6"><a class="font-bold"><v-icon
-                  color="#1e90ff"
-                  icon="mdi-text-box-multiple-outline"
-                  start
-              ></v-icon>{{ project.name }}</a></div>
+              <div class="text-h6"><a class="font-bold">
+                <v-icon
+                    color="#1e90ff"
+                    icon="mdi-text-box-multiple-outline"
+                    start
+                ></v-icon>
+                {{ project.name }}</a></div>
               <v-spacer></v-spacer>
 
               <v-chip
@@ -113,13 +117,6 @@ export default {
 .deadline_text {
   font-size: large;
   font-weight: bold;
-}
-
-.name_and_button {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1%;
-  font-size: x-large;
 }
 
 .projects {

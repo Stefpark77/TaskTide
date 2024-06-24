@@ -198,7 +198,7 @@
           <v-btn
               icon="mdi-plus"
               class="bg-blue-400 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline ml-2"
-              v-if="toAddDependency !== ''"
+              v-if="toAddDependency !== ''  && toAddDependency !== null && toAddDependency !== undefined"
               type="button" @click="addTaskDependency(task.id, toAddDependency)"/>
         </div>
         <v-card-title class="d-flex align-center pe-2">
@@ -319,7 +319,7 @@
           <v-btn
               icon="mdi-plus"
               class="bg-blue-400 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline ml-2"
-              v-if="toAddDependencyOn !== ''"
+              v-if="toAddDependencyOn !== '' && toAddDependencyOn !== null && toAddDependencyOn !== undefined"
               type="button" @click="addTaskDependency(toAddDependencyOn, task.id)"/>
         </div>
 
@@ -372,9 +372,9 @@ export default {
       this.$store?.commit('setShowTaskPage', false);
     },
     exitTask() {
+      this.$store?.commit('setShowTasks', false);
       this.$store?.commit('setShowTaskPage', false);
-      this.$store?.commit('setShowTasks', true);
-      /*this.$store?.commit('fetchTasks', true);*/
+      this.$store?.commit('fetchTasks', true);
     },
     removeTask(id) {
       this.$store?.commit('removeTask', id);
@@ -388,6 +388,8 @@ export default {
       this.$store?.commit('createTaskDependency', {taskId: id, dependsOnId: dependsOnId});
       this.$store?.commit('fetchTaskDependenciesByDependsOnId', this.task.id);
       this.$store?.commit('fetchTaskDependenciesByTaskId', this.task.id);
+      this.toAddDependency = '';
+      this.toAddDependencyOn = '';
     },
     openTask(task) {
       this.$store?.commit('setTaskPage', task);
@@ -457,35 +459,6 @@ export default {
   width: auto;
   height: 90%;
   padding: 3%;
-}
-
-.task_properties2 {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  border-top: gray 2px;
-}
-
-.description_container2 {
-  display: flex;
-  justify-content: space-evenly;
-  margin-bottom: 1%;
-  min-width: 90%;
-  min-height: 50%;
-  padding: 10px;
-}
-
-.description2 {
-  font-size: large;
-  display: flex;
-  justify-content: flex-start;
-  border: 1px solid #ccc;
-  border-radius: 25px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  padding: 20px;
-  height: auto;
-  margin-bottom: 1%;
 }
 
 .switch_button {

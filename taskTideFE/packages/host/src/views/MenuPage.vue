@@ -1,35 +1,55 @@
 <template>
-  <Menu />
-  <Events />
+  <Menu/>
+  <Events/>
   <div class="mt-10"/>
-  <div v-if="showAddEvent"><AddEvent /></div>
-  <div v-if="showEditEvent"><UpdateEvent /></div>
-  <div v-if="showAddTask"><AddTask /></div>
-  <div v-if="showEditTask"><UpdateTask /></div>
-  <div v-if="showAddProject"><AddProject /></div>
-  <div v-if="showEditProject"><UpdateProject /></div>
-  <div v-if="showProjects"><Projects /></div>
-  <div v-if="showTasks"><Tasks /></div>
-  <div v-if="showTaskPage"><TaskPage /></div>
-  <div v-if="showProjectPage"><ProjectPage /></div>
+  <div v-if="showAddEvent">
+    <AddEvent/>
+  </div>
+  <div v-if="showEditEvent">
+    <UpdateEvent/>
+  </div>
+  <div v-if="showAddTask">
+    <AddTask/>
+  </div>
+  <div v-if="showEditTask">
+    <UpdateTask/>
+  </div>
+  <div v-if="showAddProject">
+    <AddProject/>
+  </div>
+  <div v-if="showEditProject">
+    <UpdateProject/>
+  </div>
+  <div v-if="showProjects">
+    <Projects/>
+  </div>
+  <div v-if="showTasks">
+    <Tasks/>
+  </div>
+  <div v-if="showTaskPage">
+    <TaskPage/>
+  </div>
+  <div v-if="showProjectPage">
+    <ProjectPage/>
+  </div>
   <router-view></router-view>
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import {defineAsyncComponent} from 'vue';
 
 export default {
   beforeCreate() {
     this.$store?.commit('prepareMenu', true);
     this.$store?.commit('fetchWeekEvents', null);
-    this.$store?.commit('fetchTasks', true);
+    this.$store?.commit('fetchTasks', null);
     this.$store?.commit('fetchProjects', true);
     this.$store?.commit('setShowEvents', true);
   },
   mounted() {
     this.$store?.commit('prepareMenu', true);
     this.$store?.commit('fetchWeekEvents', null);
-    this.$store?.commit('fetchTasks', true);
+    this.$store?.commit('fetchTasks', null);
     this.$store?.commit('fetchProjects', true);
     this.$store?.commit('setShowEvents', true);
   },

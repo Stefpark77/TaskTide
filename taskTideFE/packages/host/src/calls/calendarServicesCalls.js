@@ -39,7 +39,7 @@ export const getEventsByUserId = async (userId, token) => {
 
 export const getEventsByUserIdAndDay = async (userId, day, token) => {
     try {
-        return await axios.get(calendarServicesURL + 'event/userId/' + userId +'/day/' + day, {
+        return await axios.get(calendarServicesURL + 'event/userId/' + userId + '/day/' + day, {
             headers: {
                 "Authorization": 'Bearer ' + token
             }

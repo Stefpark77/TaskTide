@@ -4,8 +4,7 @@ import axios from "axios";
 export const getAllUsers = async () => {
     try {
         return await axios.get(userServicesURL + 'user');
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
@@ -17,8 +16,7 @@ export const getUserByUserId = async (userId, token) => {
                 'Authorization': 'Bearer ' + token
             }
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
@@ -26,8 +24,7 @@ export const getUserByUserId = async (userId, token) => {
 export const getUserByUsername = async (username) => {
     try {
         return await axios.get(userServicesURL + 'user/public/username' + `${username}`);
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
@@ -38,16 +35,14 @@ export const getUserByProjectId = async (projectId, token) => {
                 'Authorization': 'Bearer ' + token
             }
         });
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
 export const deleteUser = (userId) => {
     try {
         return axios.delete(userServicesURL + 'user/' + `${userId}`);
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
@@ -55,8 +50,7 @@ export const deleteUser = (userId) => {
 export const createUser = (user) => {
     try {
         return axios.post(userServicesURL + 'user', user);
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
@@ -64,8 +58,7 @@ export const createUser = (user) => {
 export const updateUser = (user) => {
     try {
         return axios.put(userServicesURL + 'user', user);
-    }
-    catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }

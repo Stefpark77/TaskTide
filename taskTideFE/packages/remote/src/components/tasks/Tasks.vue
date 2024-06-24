@@ -50,7 +50,7 @@
       <div class="tasks">
 
         <v-card class="task"
-                v-for="task in this.$store?.state?.tasks.filter(t => (t.stage === currentStage || currentStage==='ALL') && (searchBar === '' || searchBar === undefined || t.name.includes(searchBar)))"
+                v-for="task in this.$store?.state?.tasks.filter(t => (t.stage === currentStage || currentStage==='ALL') && (searchBar === '' || searchBar === undefined || t.name.toLowerCase().includes(searchBar.toLowerCase())))"
                 :key="task.id">
           <v-card-item>
             <v-card-title class="text-body-2 d-flex align-center ">
@@ -62,7 +62,7 @@
                     icon="mdi-checkbox-blank-outline"
                     start
                 ></v-icon>
-                {{ task.name.length >30 ? task.name.slice(0, 30) + '..' : task.name }}
+                {{ task.name.length > 30 ? task.name.slice(0, 30) + '..' : task.name }}
               </a></div>
               <v-spacer></v-spacer>
 
@@ -215,13 +215,6 @@ export default {
       this.$store?.commit('fetchTaskDependenciesByDependsOnId', task.id);
       this.$store?.commit('fetchTaskDependenciesByTaskId', task.id);
     },
-    updateTask(task) {
-      this.$store?.commit('setUpdateTask', task);
-      this.$store?.commit('setShowTasks', false);
-    },
-    test() {
-      console.log(this.currentStage);
-    },
   },
 };
 </script>
@@ -234,51 +227,6 @@ export default {
   right: 0;
   position: absolute;
   background-color: lightsteelblue;
-}
-
-.task_properties {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-}
-
-.deadlines {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-}
-
-.deadline_text {
-  font-size: large;
-  font-weight: bold;
-}
-
-.name_and_button {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1%;
-  font-size: x-large;
-}
-
-.description_container3 {
-  display: flex;
-  justify-content: space-evenly;
-  margin-bottom: 1%;
-  min-height: 250px;
-}
-
-.description {
-  font-size: large;
-  display: flex;
-  justify-content: space-evenly;
-  border: 1px solid #ccc;
-  border-radius: 25px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 85%;
-  height: 94%;
-  padding: 20px;
-
-  margin-bottom: 1%;
 }
 
 .tasks {
@@ -322,8 +270,5 @@ export default {
   color: black;
   margin-up: 10%;
   margin-bottom: 50%;
-}
-.test{
-  width: 10px;
 }
 </style>

@@ -2,7 +2,7 @@ package com.tasktide.calendarServices.service;
 
 import com.tasktide.calendarServices.model.Event;
 import com.tasktide.calendarServices.repository.EventRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -13,12 +13,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class EventService {
-    EventRepository eventRepository;
-    @Autowired
-    public EventService(EventRepository eventRepository) {
-        this.eventRepository = eventRepository;
-    }
+    private final EventRepository eventRepository;
 
     public Event getEventByEventId(String eventId) {
         return eventRepository.findEventById(eventId);
@@ -27,15 +24,17 @@ public class EventService {
     public List<Event> getEventsByUserId(String userId) {
         return eventRepository.findEventsByUserId(userId);
     }
+
     public List<Event> getEventsByUserIdAndDay(String userId, Instant day) {
         return eventRepository.findEventsByUserId(userId).stream()
-                .filter(event -> isEventOccurring(event,day))
+                .filter(event -> isEventOccurring(event, day))
                 .toList();
     }
 
     public List<Event> getAllEvents() {
         return eventRepository.findAllEvents();
     }
+
     public Event addNewEvent(Event event) {
         return eventRepository.createEvent(event);
     }
@@ -52,7 +51,7 @@ public class EventService {
         LocalDate eventDate = event.getDate().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate endDate = event.getEndDate().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate dayDate = day.atZone(ZoneId.systemDefault()).toLocalDate();
-        switch (event.getRecurringTime()){
+        switch (event.getRecurringTime()) {
             case ONCE:
                 return dayDate.isAfter(eventDate) && dayDate.isBefore(endDate) || dayDate.isEqual(eventDate) || dayDate.isEqual(endDate);
             case DAILY:

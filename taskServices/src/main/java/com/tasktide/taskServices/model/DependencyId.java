@@ -8,6 +8,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DependencyId implements Serializable {
-     private String taskId;
-     private String dependsOnId;
+    private String taskId;
+    private String dependsOnId;
 }

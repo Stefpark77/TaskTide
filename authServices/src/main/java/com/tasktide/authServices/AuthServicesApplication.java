@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories
 public class AuthServicesApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(AuthServicesApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(AuthServicesApplication.class, args);
+    }
 
 }

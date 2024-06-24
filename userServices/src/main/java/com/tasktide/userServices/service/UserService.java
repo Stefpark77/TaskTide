@@ -2,19 +2,15 @@ package com.tasktide.userServices.service;
 
 import com.tasktide.userServices.model.User;
 import com.tasktide.userServices.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-    UserRepository userRepository;
-    @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private final UserRepository userRepository;
 
     public User getUserByUserId(String userId) {
         return userRepository.findUserById(userId);
@@ -23,12 +19,15 @@ public class UserService {
     public User getUserByUsername(String username) {
         return userRepository.findUserByUsername(username);
     }
+
     public List<User> getUserByProjectId(String projectId) {
         return userRepository.findUserByProjectId(projectId);
     }
+
     public List<User> getAllUsers() {
         return userRepository.findAllUsers();
     }
+
     public User addNewUser(User user) {
         return userRepository.createUser(user);
     }

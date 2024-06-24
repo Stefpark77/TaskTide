@@ -2,19 +2,15 @@ package com.tasktide.projectServices.service;
 
 import com.tasktide.projectServices.model.ProjectUser;
 import com.tasktide.projectServices.repository.ProjectUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ProjectUserService {
-    private ProjectUserRepository projectUserRepository;
-
-    @Autowired
-    public ProjectUserService(ProjectUserRepository projectUserRepository) {
-        this.projectUserRepository = projectUserRepository;
-    }
+    private final ProjectUserRepository projectUserRepository;
 
     public List<ProjectUser> getProjectUsersByUserId(String userId) {
         return projectUserRepository.findProjectUsersForUserId(userId);
@@ -30,6 +26,10 @@ public class ProjectUserService {
 
     public ProjectUser removeProjectUser(String userId, String projectId) {
         return projectUserRepository.deleteProjectUser(userId, projectId);
+    }
+
+    public void removeAllProjectUsersForProjectId(String projectId) {
+        projectUserRepository.deleteAllProjectUsersForProjectId(projectId);
     }
 }
 

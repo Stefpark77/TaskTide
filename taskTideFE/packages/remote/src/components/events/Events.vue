@@ -15,7 +15,10 @@
         <v-tabs>
           <v-btn
               class="h-100 left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold  focus:outline-none focus:shadow-outline"
-              v-on:click="previousWeek"><v-icon icon="mdi-arrow-left-bold-circle-outline"/>PREVIOUS Week</v-btn>
+              v-on:click="previousWeek">
+            <v-icon icon="mdi-arrow-left-bold-circle-outline"/>
+            PREVIOUS Week
+          </v-btn>
           <v-tab
               prepend-icon="mdi-calendar"
               class="tab_week"
@@ -28,7 +31,9 @@
 
           <v-btn
               class="h-100 left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold  focus:outline-none focus:shadow-outline"
-              v-on:click="nextWeek">Next Week<v-icon icon="mdi-arrow-right-bold-circle-outline"/></v-btn>
+              v-on:click="nextWeek">Next Week
+            <v-icon icon="mdi-arrow-right-bold-circle-outline"/>
+          </v-btn>
         </v-tabs>
         <v-spacer></v-spacer>
         <v-tabs>
@@ -78,7 +83,7 @@
           </v-card-title>
           <v-card
               class=" my-8  event"
-              v-for="event in dayEvents.filter(e => searchBar === '' || e.name.includes(searchBar))"
+              v-for="event in dayEvents.filter(e => searchBar === '' || e.name.toLowerCase().includes(searchBar.toLowerCase()))"
               :key="event.id">
             <v-card-item>
               <v-card-title class="text-body-2 d-flex align-center ">
@@ -89,14 +94,14 @@
                 ></v-icon>
                 <a v-if="isFullDay(event, getDayOfWeek(index))">Full Day</a>
                 <div class="text-medium-emphasis font-weight-bold" v-if="!isFullDay(event, getDayOfWeek(index))">
-                {{ getStartHours(event, getDayOfWeek(index)) }}
-                <v-icon
-                    color="#1e90ff"
-                    icon="mdi-arrow-right-bold"
-                    start
-                ></v-icon>
-                {{ getEndHours(event, getDayOfWeek(index))}}
-              </div>
+                  {{ getStartHours(event, getDayOfWeek(index)) }}
+                  <v-icon
+                      color="#1e90ff"
+                      icon="mdi-arrow-right-bold"
+                      start
+                  ></v-icon>
+                  {{ getEndHours(event, getDayOfWeek(index)) }}
+                </div>
 
                 <v-spacer></v-spacer>
 
@@ -170,13 +175,13 @@ export default {
     addEvent() {
       this.$store?.commit('setShowAddEvent', true);
       this.$store?.commit('setShowEvents', false);
-      this.numberOfWeeks=0;
+      this.numberOfWeeks = 0;
     },
     updateEvent(event) {
       this.$store?.commit('setUpdateEvent', event);
       this.$store?.commit('setShowEditEvent', true);
       this.$store?.commit('setShowEvents', false);
-      this.numberOfWeeks=0;
+      this.numberOfWeeks = 0;
     },
     previousWeek() {
       this.numberOfWeeks--;
@@ -206,8 +211,8 @@ export default {
       }
       return false;
     },
-    getStartHours(event, dayOfEvent){
-      if(event.recurringTime !== 'ONCE'){
+    getStartHours(event, dayOfEvent) {
+      if (event.recurringTime !== 'ONCE') {
         return format(parseISO(event.date), "HH:mm");
       }
       if (format(parseISO(event.date), "MMMM dd, yyyy") !== format(dayOfEvent, "MMMM dd, yyyy") &&
@@ -216,8 +221,8 @@ export default {
       }
       return format(parseISO(event.date), "HH:mm");
     },
-    getEndHours(event, dayOfEvent){
-      if(event.recurringTime !== 'ONCE'){
+    getEndHours(event, dayOfEvent) {
+      if (event.recurringTime !== 'ONCE') {
         return format(parseISO(event.endDate), "HH:mm");
       }
       if (format(parseISO(event.date), "MMMM dd, yyyy") === format(dayOfEvent, "MMMM dd, yyyy") &&
@@ -226,7 +231,7 @@ export default {
       }
       return format(parseISO(event.date), "HH:mm");
     },
-    },
+  },
 };
 </script>
 
@@ -238,44 +243,6 @@ export default {
   right: 0;
   position: absolute;
   background-color: lightsteelblue;
-}
-
-.dates {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-}
-
-.date_text {
-  font-size: large;
-  font-weight: bold;
-}
-
-.name_and_button {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1%;
-  font-size: x-large;
-}
-
-.description_container {
-  display: flex;
-  justify-content: space-evenly;
-  margin-bottom: 1%;
-}
-
-.description {
-  font-size: large;
-  display: flex;
-  justify-content: space-evenly;
-  border: 1px solid #ccc;
-  border-radius: 25px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 85%;
-  height: 94%;
-  padding: 20px;
-
-  margin-bottom: 1%;
 }
 
 .events {
@@ -305,7 +272,7 @@ export default {
   justify-content: space-between;
 }
 
-.tab_week{
+.tab_week {
   background-color: white;
   padding: 10px 50px;
   font-weight: bold;
@@ -319,9 +286,5 @@ export default {
 
 .white-bar {
   height: 4%;
-}
-
-.dayText{
-  color: white;
 }
 </style>

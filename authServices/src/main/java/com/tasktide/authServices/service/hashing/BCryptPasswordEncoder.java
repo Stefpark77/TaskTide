@@ -1,4 +1,5 @@
 package com.tasktide.authServices.service.hashing;
+
 import at.favre.lib.crypto.bcrypt.BCrypt;
 
 public class BCryptPasswordEncoder {

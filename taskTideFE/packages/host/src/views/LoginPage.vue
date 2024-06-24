@@ -1,11 +1,13 @@
 <template>
-  <Login />
-  <div v-if="showSignUp"><SignUp /></div>
+  <Login/>
+  <div v-if="showSignUp">
+    <SignUp/>
+  </div>
   <router-view></router-view>
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import {defineAsyncComponent} from 'vue';
 
 export default {
   components: {

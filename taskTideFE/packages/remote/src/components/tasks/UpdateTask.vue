@@ -9,8 +9,11 @@
                 class="mb-5"
                 label="Name"
                 v-model="updateName"
+                :rules="[value => value !== '' || 'This field is required.']"
             ></v-text-field>
-            <v-textarea id="description" rows="10" min-width="500px" type="text" placeholder="Description" v-model="updateDescription" />
+            <v-textarea id="description" rows="10" min-width="500px" type="text" placeholder="Description"
+                        v-model="updateDescription"
+                        :rules="[value => value !== '' || 'This field is required.']"/>
           </div>
           <div class="mr-6">
 
@@ -19,15 +22,17 @@
                 :items="priorityValues"
                 density="compact"
                 label="Priority"
-                v-model = "updatePriority"
+                :rules="[value => value !== '' || 'This field is required.']"
+                v-model="updatePriority"
             ></v-select>
 
             <v-select
                 class="mb-1"
                 :items="stages"
                 density="compact"
-                label="Priority"
-                v-model = "updateStage"
+                label="Stage"
+                :rules="[value => value !== '' || 'This field is required.']"
+                v-model="updateStage"
             ></v-select>
 
             <div v-if="updateStage === 'IN_PROGRESS'">
@@ -46,12 +51,15 @@
                 class="mb-5"
                 type="number"
                 label="Difficulty"
-                :rules="[value => value >= 0 || 'No negative numbers allowed']"
+                :rules="[value => value >= 0 || 'No negative numbers allowed',
+                value => value !== '' || 'This field is required.']"
                 v-model="updateDifficulty"
             ></v-text-field>
             <div class="flex items-end justify-end">
               <v-btn
-                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline mb-5"
+                  :disabled="updateDescription === '' "
+                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline mb-5
+                  disabledFunction"
                   type="button" @click="estimateDifficulty">
                 Estimate Difficulty
               </v-btn>
@@ -70,7 +78,12 @@
               </v-btn>
 
               <v-btn
-                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+                  :disabled="updateName === '' ||
+             updateDescription === '' ||
+             updatePriority === '' ||
+             updateDifficulty === null || updateDifficulty === '' || updateDifficulty < 0"
+                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline
+                  disabledFunction"
                   type="button" @click="updateTask">
                 Update
               </v-btn>
@@ -150,7 +163,6 @@ export default {
 
       });
       this.$store?.commit('setShowEditTask', false);
-      this.$store?.commit('setShowTasks', true);
     },
     cancelUpdate() {
       this.$store?.commit('setShowEditTask', false);
@@ -159,11 +171,15 @@ export default {
     removeTask(id) {
       this.$store?.commit('removeTask', id);
       this.$store?.commit('setShowEditTask', false);
-      this.$store?.commit('setShowTasks', true);
     },
     estimateDifficulty() {
-      this.$store?.commit('estimateDifficulty', {text: this.updateDescription});
-      this.updateDifficulty = this.$store?.state?.updateDifficulty ?? '';
+      this.$store.dispatch('estimateDifficulty', this.updateDescription)
+          .then((difficulty) => {
+            this.updateDifficulty = difficulty;
+          })
+          .catch((error) => {
+            console.error('Error estimating difficulty:', error);
+          });
     },
   },
 };
@@ -185,4 +201,8 @@ export default {
   color: black;
 }
 
+.disabledFunction:disabled {
+  background-color: dodgerblue;
+  opacity: 75%;
+}
 </style>

@@ -2,17 +2,15 @@ package com.tasktide.projectServices.service;
 
 import com.tasktide.projectServices.model.Project;
 import com.tasktide.projectServices.repository.ProjectRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ProjectService {
-    ProjectRepository projectRepository;
-    @Autowired
-    public ProjectService(ProjectRepository projectRepository) {
-        this.projectRepository = projectRepository;
-    }
+    private final ProjectRepository projectRepository;
 
     public Project getProjectByProjectId(String projectId) {
         return projectRepository.findProjectById(projectId);
@@ -21,6 +19,7 @@ public class ProjectService {
     public List<Project> getAllProjects() {
         return projectRepository.findAllProjects();
     }
+
     public Project addNewProject(Project project) {
         return projectRepository.createProject(project);
     }

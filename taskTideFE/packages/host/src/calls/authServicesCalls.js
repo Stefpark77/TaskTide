@@ -9,14 +9,6 @@ export async function login(loginRequest) {
     }
 }
 
-export async function logout() {
-    try {
-        return;
-    } catch (error) {
-        console.error(error);
-    }
-}
-
 export const signUp = async (signUpRequest) => {
     try {
         return await axios.post(authServicesURL + 'auth/sign-up', signUpRequest);

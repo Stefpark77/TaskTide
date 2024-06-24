@@ -2,7 +2,7 @@ import {createApp} from "vue";
 import {createStore} from "vuex";
 import * as VueRouter from "vue-router";
 
-import {login, signUp, logout} from "./calls/authServicesCalls";
+import {login, signUp} from "./calls/authServicesCalls";
 import {
     getAllEvents,
     getEventsByUserId,
@@ -62,7 +62,7 @@ const router = VueRouter.createRouter({
 
 const checkAuth = async (response) => {
     if (response?.status === 500 || !response) {
-        //window.location.href = '/';
+        window.location.href = '/';
     }
 }
 
@@ -180,8 +180,6 @@ const store = createStore({
         },
         async logout() {
             try {
-                const response = await logout();
-
                 localStorage.setItem("userId", '')
                 localStorage.setItem("token", '')
                 window.location.href = '/';
@@ -301,6 +299,12 @@ const store = createStore({
             state.updateDescription = event.description;
             state.updateDate = format(parseISO(event.date), "yyyy-MM-dd'T'HH:mm:ss");
             state.updateEndDate = format(parseISO(event.endDate), "yyyy-MM-dd'T'HH:mm:ss");
+
+            if (parseISO(state.updateDate).getDate() === parseISO(state.updateEndDate).getDate()
+            && parseISO(state.updateDate).getHours() === 0 && parseISO(state.updateDate).getMinutes() === 0
+            && parseISO(state.updateEndDate).getHours() === 23 && parseISO(state.updateEndDate).getMinutes() === 59){
+                state.updateDate = format(parseISO(event.date), "yyyy-MM-dd");
+            }
             state.updateRecurring = event.recurringTime;
 
         },
@@ -355,7 +359,7 @@ const store = createStore({
                 console.error(error);
             }
         },
-        async fetchTasks(state) {
+        async fetchTasks(state, showTasks) {
             try {
                 if(state.token===''){
                     state.token = localStorage.getItem("token");
@@ -365,15 +369,15 @@ const store = createStore({
                 }
                 const responseProjects = await getProjectByUserId(state.currentUser.id, state.token);
 
-                checkAuth(responseProjects);
+                await checkAuth(responseProjects);
 
                 if (responseProjects.status !== 200) throw new Error('Failed to get enrolled Projects');
-                var projectIds = responseProjects.data.map(projectUser => projectUser.projectId)
+                let projectIds = responseProjects.data.map(projectUser => projectUser.projectId);
 
 
                 const response = await getTaskByUserId(state.currentUser.id, projectIds, state.token);
 
-                checkAuth(response);
+                await checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to get tasks');
 
@@ -395,6 +399,9 @@ const store = createStore({
                     updatedTasks.push(task);
                 }
                 state.tasks = updatedTasks;
+                if(showTasks === true){
+                    state.showTasks = true;
+                }
             } catch (error) {
                 console.error(error);
             }
@@ -451,7 +458,7 @@ const store = createStore({
 
                 if (response.status !== 200) throw new Error('Failed to delete task');
 
-                state.tasks = state.tasks.filter(task => task.id !== taskId);
+                await this.commit("fetchTasks", true)
             } catch (error) {
                 console.error(error);
             }
@@ -470,7 +477,7 @@ const store = createStore({
                 var taskResponse = response.data;
                 taskResponse.user = state.currentUser;
 
-                state.tasks.push(taskResponse);
+                await this.commit("fetchTasks", true)
             } catch (error) {
                 console.error(error);
             }
@@ -517,7 +524,8 @@ const store = createStore({
                 } else {
                     updatedTask.project = null;
                 }
-                state.tasks = state.tasks.map(e => e.id === task.id ? updatedTask : e);
+
+                await this.commit("fetchTasks", true)
 
             } catch (error) {
                 console.error(error);
@@ -620,22 +628,6 @@ const store = createStore({
             }
         },
 
-        async estimateDifficulty(state, description) {
-            try {
-                const response = await getEstimatedDifficulty(description, state.token);
-
-                checkAuth(response);
-
-                if (response.status !== 200) throw new Error('Failed to create task dependency');
-
-                console.log(response.data)
-                state.addDifficulty = response.data.difficulty;
-                state.updateDifficulty = response.data.difficulty;
-            } catch (error) {
-                console.error(error);
-            }
-        },
-
         /*Project Services*/
         async fetchProjects(state) {
             if(state.token===''){
@@ -659,8 +651,7 @@ const store = createStore({
                 checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to delete project');
-
-                state.projects = state.projects.filter(project => project.id !== projectId);
+                await this.commit("fetchProjects", null)
             } catch (error) {
                 console.error(error);
             }
@@ -675,8 +666,7 @@ const store = createStore({
                 checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to create project');
-
-                state.projects.push(response.data);
+                await this.commit("fetchProjects", null)
             } catch (error) {
                 console.error(error);
             }
@@ -691,7 +681,6 @@ const store = createStore({
             state.updateName = project.name;
             state.updateDescription = project.description;
             state.updateDeadline = format(parseISO(project.deadline), "yyyy-MM-dd");
-
         },
         async updateProject(state, project) {
             try {
@@ -704,10 +693,8 @@ const store = createStore({
                 const response = await updateProject(project, state.token);
 
                 checkAuth(response);
-
                 if (response.status !== 200) throw new Error('Failed to update project');
-
-                state.projects = state.projects.map(e => e.id === project.id ? response.data : e);
+                await this.commit("fetchProjects", null)
 
                 state.showEditProject = false;
             } catch (error) {
@@ -812,7 +799,6 @@ const store = createStore({
         setShowEditEvent(state, showEditEvent) {
             state.showEditEvent = showEditEvent;
         },
-
         setShowEditTask(state, showEditTask) {
             state.showEditTask = showEditTask;
         },
@@ -905,11 +891,25 @@ const store = createStore({
             state.showTaskPage = showTaskPage;
         },
     },
+    actions:{
+        async estimateDifficulty({commit}, description) {
+            try {
+                const response = await getEstimatedDifficulty({text: description});
+                checkAuth(response);
+
+                if (response.status !== 200) throw new Error('Failed to create task dependency');
+                console.log(response.data)
+                return response.data.difficulty;
+            } catch (error) {
+                console.error(error);
+            }
+        },
+    }
 });
 
 import {createVuetify} from 'vuetify';
-import 'vuetify/dist/vuetify.min.css'; // Make sure this line is here to import Vuetify styles
-import './index.scss'; // Ensure this line is here to import your custom styles
+import 'vuetify/dist/vuetify.min.css'; //import Vuetify styles
+import './index.scss'; // import your custom styles
 import 'vuetify/styles'; // Vuetify 3 specific import
 import "@mdi/font/css/materialdesignicons.css";
 import {aliases, mdi} from "vuetify/lib/iconsets/mdi.mjs";

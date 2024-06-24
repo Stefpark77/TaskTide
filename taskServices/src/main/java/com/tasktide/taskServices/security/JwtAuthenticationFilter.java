@@ -34,9 +34,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private Optional<String> extractTokenFromRequest(HttpServletRequest request){
+    private Optional<String> extractTokenFromRequest(HttpServletRequest request) {
         var token = request.getHeader("Authorization");
-        if (StringUtils.hasLength(token) && token.startsWith("Bearer ")){
+        if (StringUtils.hasLength(token) && token.startsWith("Bearer ")) {
             return Optional.of(token.substring(7));
         }
         return Optional.empty();
@@ -48,16 +48,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .verify(token);
     }
 
-    private UserPrincipal convert(DecodedJWT jwt){
+    private UserPrincipal convert(DecodedJWT jwt) {
         return UserPrincipal.builder()
                 .userId(jwt.getSubject())
                 .username(jwt.getClaim("username").asString())
                 .role(Role.valueOf(jwt.getClaim("role").asString()))
                 .build();
     }
-
-
-
 
 
 }

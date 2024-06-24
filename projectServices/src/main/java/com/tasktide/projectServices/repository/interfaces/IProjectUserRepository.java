@@ -6,4 +6,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface IProjectUserRepository extends CrudRepository<ProjectUser, ProjectUserId> {
     Iterable<ProjectUser> findProjectUserByUserIdContains(String userId);
+
+    Iterable<ProjectUser> findProjectUserByProjectIdContains(String projectId);
 }

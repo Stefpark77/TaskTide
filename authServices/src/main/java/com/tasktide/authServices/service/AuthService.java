@@ -3,19 +3,16 @@ package com.tasktide.authServices.service;
 import com.tasktide.authServices.model.User;
 import com.tasktide.authServices.repository.AuthRepository;
 import com.tasktide.authServices.service.hashing.BCryptPasswordEncoder;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
-    AuthRepository authRepository;
-    @Autowired
-    public AuthService(AuthRepository authRepository) {
-        this.authRepository = authRepository;
-    }
+    private final AuthRepository authRepository;
 
     public User getUserByUsername(String username) {
         List<User> userList = authRepository.findUsersByUsername(username);
@@ -24,7 +21,7 @@ public class AuthService {
 
     public User loginUser(String username, String password) {
         User user = getUserByUsername(username);
-        if(!BCryptPasswordEncoder.match(password, user.getHashedPassword())){
+        if (!BCryptPasswordEncoder.match(password, user.getHashedPassword())) {
             return null;
         }
         return user;

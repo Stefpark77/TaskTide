@@ -20,8 +20,7 @@ public enum Role {
     ADMIN(Set.of(ADMIN_CREATE,
             ADMIN_READ,
             ADMIN_UPDATE,
-            ADMIN_DELETE))
-    ;
+            ADMIN_DELETE));
     private final Set<Permission> permissions;
 
     public List<SimpleGrantedAuthority> getAuthorities() {

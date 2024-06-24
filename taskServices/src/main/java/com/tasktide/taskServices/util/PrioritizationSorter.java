@@ -4,23 +4,25 @@ import com.tasktide.taskServices.model.EstimatedDeadlineTask;
 import com.tasktide.taskServices.model.Task;
 import com.tasktide.taskServices.model.TaskDependency;
 import com.tasktide.taskServices.repository.TaskDependencyRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class PrioritizationSorter {
-
-    @Autowired
-    private TaskDependencyRepository taskDependencyRepository;
+    private final TaskDependencyRepository taskDependencyRepository;
 
     private static final Comparator<EstimatedDeadlineTask> COMPARISON_METHOD = Comparator.comparing(EstimatedDeadlineTask::getEstimatedDeadline)
             .thenComparing(EstimatedDeadlineTask::getPriority)
-            .thenComparing(EstimatedDeadlineTask::getDifficulty)
+            .thenComparing(EstimatedDeadlineTask::getDifficulty, Comparator.reverseOrder())
             .thenComparing(EstimatedDeadlineTask::getName);
 
     public List<Task> sortByPrioritizationTasks(List<Task> tasks) {
@@ -29,64 +31,29 @@ public class PrioritizationSorter {
         Map<String, List<String>> dependencyMap = getDependencyMap(tasks);
 
         //get estimated deadlines
-        Map<EstimatedDeadlineTask, List<EstimatedDeadlineTask>> estimatedTasksMap = getTasksWithEstimatedDeadlines(tasks, dependencyMap);
+        List<EstimatedDeadlineTask> estimatedTasks = getTasksWithEstimatedDeadlines(tasks, dependencyMap);
 
-        // Perform topological sort
-        List<String> sortedTaskIds = topologicalSort(estimatedTasksMap);
+        //sort tasks
+        estimatedTasks.sort(COMPARISON_METHOD);
 
+        //changes tasks with estimated deadlines to their original model
         Map<String, Task> taskMap = tasks.stream()
                 .collect(Collectors.toMap(Task::getId, task -> task));
 
-        return sortedTaskIds.stream()
-                .map(taskMap::get)
+        return estimatedTasks.stream()
+                .map(eTask -> taskMap.get(eTask.getTaskId()))
                 .toList();
-    }
-
-    private List<String> topologicalSort(Map<EstimatedDeadlineTask, List<EstimatedDeadlineTask>> dependencyMap) {
-        List<String> sortedTasks = new ArrayList<>();
-        Set<String> visited = new HashSet<>();
-        Stack<String> stack = new Stack<>();
-
-        // DFS
-        List<EstimatedDeadlineTask> keys = new ArrayList<>(dependencyMap.keySet().stream().toList());
-        keys.sort(COMPARISON_METHOD);
-        for (EstimatedDeadlineTask task : keys) {
-            if (!visited.contains(task.getTaskId())) {
-                topologicalSortUtil(task, dependencyMap, visited, stack);
-            }
-        }
-
-        while (!stack.isEmpty()) {
-            sortedTasks.add(stack.pop());
-        }
-
-        return sortedTasks;
-    }
-
-    // Recursive utility function for topological sort
-    private void topologicalSortUtil(EstimatedDeadlineTask task, Map<EstimatedDeadlineTask, List<EstimatedDeadlineTask>> dependencyMap, Set<String> visited, Stack<String> stack) {
-        visited.add(task.getTaskId());
-
-        List<EstimatedDeadlineTask> dependencies = dependencyMap.getOrDefault(task, new ArrayList<>());
-        dependencies.stream().filter(Objects::nonNull).collect(Collectors.toList()).sort(COMPARISON_METHOD);
-        for (EstimatedDeadlineTask dependency : dependencies) {
-            if (dependency != null && !visited.contains(dependency.getTaskId())) {
-                topologicalSortUtil(dependency, dependencyMap, visited, stack);
-            }
-        }
-
-        stack.push(task.getTaskId());
     }
 
     private Map<String, List<String>> getDependencyMap(List<Task> tasks) {
         return tasks.stream()
                 .collect(Collectors.toMap(
                         Task::getId,
-                        task -> taskDependencyRepository.findDependenciesByTaskId(task.getId()).stream().map(TaskDependency::getDependsOnId).toList()
+                        task -> taskDependencyRepository.findDependenciesByDependsOnId(task.getId()).stream().map(TaskDependency::getTaskId).toList()
                 ));
     }
 
-    private Map<EstimatedDeadlineTask, List<EstimatedDeadlineTask>> getTasksWithEstimatedDeadlines(List<Task> tasks, Map<String, List<String>> dependencyIdMap) {
+    private List<EstimatedDeadlineTask> getTasksWithEstimatedDeadlines(List<Task> tasks, Map<String, List<String>> dependencyIdMap) {
         //prepare a lists of tasks with no estimated deadline
         List<EstimatedDeadlineTask> estimatedTasks = tasks.stream()
                 .map(this::transformTask)
@@ -98,13 +65,8 @@ public class PrioritizationSorter {
         for (EstimatedDeadlineTask estimatedDeadlineTask : estimatedTasks) {
             updateEstimatedDeadlineForTask(estimatedDeadlineTask, dependencyIdMap, estimatedTaskMap);
         }
-        //get a dependency map with these estimated tasks
-        return dependencyIdMap.entrySet().stream()
-                .collect(Collectors.toMap(
-                        entry -> estimatedTaskMap.get(entry.getKey()),
-                        entry -> entry.getValue().stream()
-                                .map(estimatedTaskMap::get)
-                                .collect(Collectors.toList())));
+
+        return new ArrayList<>(estimatedTasks);
 
     }
 
@@ -149,6 +111,5 @@ public class PrioritizationSorter {
         estimatedDeadlineTask.setPriority(task.getPriority());
         return estimatedDeadlineTask;
     }
-
 
 }

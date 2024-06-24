@@ -8,12 +8,17 @@
                 hide-details="auto"
                 class="mb-5"
                 label="Name"
+                :rules="[value => value !== '' || 'This field is required.']"
                 v-model="updateName"
             ></v-text-field>
-            <v-textarea id="description" rows="10" min-width="500px" type="text" placeholder="Description" v-model="updateDescription" />
+            <v-textarea id="description" rows="10" min-width="500px" type="text" placeholder="Description"
+                        v-model="updateDescription"
+                        :rules="[value => value !== '' || 'This field is required.']"/>
 
             <v-text-field type="date"
-                          label = "Deadline"
+                          label="Deadline"
+                          :rules="[value => value !== '' || 'This field is required.',
+                        value => parseISO(value) > Date.now() || 'The deadline must be after today\'s date!']"
                           v-model="updateDeadline"
             ></v-text-field>
 
@@ -29,7 +34,10 @@
                 Delete
               </v-btn>
               <v-btn
-                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
+                  :disabled="updateName === '' ||
+             updateDescription === '' ||
+             updateDeadline === '' || parseISO(updateDeadline) <= Date.now()"
+                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline disabledFunction"
                   type="button" @click="updateProject">
                 Update Project
               </v-btn>
@@ -41,51 +49,76 @@
   </div>
 </template>
 <script>
+import {format, parseISO} from "date-fns";
+
 export default {
-    data() {
-        return {
-          editProjectId: this.$store?.state?.editProjectId ?? '',
-          updateName: this.$store?.state?.updateName ?? '',
-          updateDescription: this.$store?.state?.updateDescription ?? '',
-          updateDeadline: this.$store?.state?.updateDeadline ?? '',
-        };
-    },
-    watch: {
-        updateName: {
-            handler: function (val) {
-                this.$store?.commit('setUpdateName', val);
-            },
-            deep: true,
-        },
-        updateDescription: {
-            handler: function (val) {
-                this.$store?.commit('setUpdateDescription', val);
-            },
-            deep: true,
-        },
-        updateDeadline: {
-          handler: function (val) {
-            this.$store?.commit('setUpdateDate', val);
-          },
-          deep: true,
-        },
-    },
-    methods: {
-      updateProject() {
-            this.$store?.commit('updateProject', { name: this.updateName, description: this.updateDescription,  deadline: this.updateDeadline});
-            this.$store?.commit('setShowEditProject', false);
-            this.$store?.commit('setShowProjects', true);
-        },
-      cancelUpdate() {
-        this.$store?.commit('setShowEditProject', false);
-        this.$store?.commit('setShowProjectPage', true);
+  data() {
+    return {
+      editProjectId: this.$store?.state?.editProjectId ?? '',
+      updateName: this.$store?.state?.updateName ?? '',
+      updateDescription: this.$store?.state?.updateDescription ?? '',
+      updateDeadline: this.$store?.state?.updateDeadline ?? '',
+      projectTasks: this.$store?.state?.projectTasks ?? [],
+
+    };
+  },
+  watch: {
+    updateName: {
+      handler: function (val) {
+        this.$store?.commit('setUpdateName', val);
       },
-      removeProject(id) {
-        this.$store?.commit('removeProject', id);
-        this.$store?.commit('setShowEditProject', false);
-        this.$store?.commit('setShowProjects', true);
-      },
+      deep: true,
     },
+    updateDescription: {
+      handler: function (val) {
+        this.$store?.commit('setUpdateDescription', val);
+      },
+      deep: true,
+    },
+    updateDeadline: {
+      handler: function (val) {
+        this.$store?.commit('setUpdateDate', val);
+      },
+      deep: true,
+    },
+  },
+  methods: {
+    parseISO,
+    updateProject() {
+      this.$store?.commit('updateProject', {
+        name: this.updateName,
+        description: this.updateDescription,
+        deadline: this.updateDeadline
+      });
+      this.$store?.commit('setShowEditProject', false);
+      this.$store?.commit('setShowProjects', true);
+      const dateObject = parseISO(this.updateDeadline);
+      const newDeadline = format(dateObject, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx");
+      for (let task of this.projectTasks) {
+        this.$store?.commit('updateTaskForProject', {
+          task: task,
+          project: {id: this.editProjectId, deadline: newDeadline},
+          projectId: this.editProjectId
+        });
+      }
+    },
+    cancelUpdate() {
+      this.$store?.commit('setShowEditProject', false);
+      this.$store?.commit('setShowProjectPage', true);
+    },
+    removeProject(id) {
+      this.$store?.commit('removeProject', id);
+      this.$store?.commit('setShowEditProject', false);
+      this.$store?.commit('setShowProjects', true);
+      for (let task of this.projectTasks) {
+        this.$store?.commit('updateTaskForProject', {
+          task: task,
+          project: {id: null, deadline: null},
+          projectId: this.editProjectId
+        });
+      }
+    },
+  },
 };
 </script>
 
@@ -105,4 +138,8 @@ export default {
   color: black;
 }
 
+.disabledFunction:disabled {
+  background-color: dodgerblue;
+  opacity: 75%;
+}
 </style>

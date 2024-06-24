@@ -8,9 +8,12 @@
                 hide-details="auto"
                 class="mb-5"
                 label="Name"
+                :rules="[value => value !== '' || 'This field is required.']"
                 v-model="addName"
             ></v-text-field>
-            <v-textarea id="description" rows="10" min-width="500px" type="text" placeholder="Description" v-model="addDescription" />
+            <v-textarea id="description" rows="10" min-width="500px" type="text" placeholder="Description"
+                        v-model="addDescription"
+                        :rules="[value => value !== '' || 'This field is required.']"/>
           </div>
           <div class="mr-6">
 
@@ -19,7 +22,8 @@
                 :items="priorityValues"
                 density="compact"
                 label="Priority"
-                v-model = "addPriority"
+                :rules="[value => value !== '' || 'This field is required.']"
+                v-model="addPriority"
             ></v-select>
 
             <v-text-field
@@ -27,12 +31,15 @@
                 class="mb-5"
                 type="number"
                 label="Difficulty"
-                :rules="[value => value >= 0 || 'No negative numbers allowed']"
+                :rules="[value => value >= 0 || 'No negative numbers allowed',
+                value => value !== '' || 'This field is required.']"
                 v-model="addDifficulty"
             ></v-text-field>
             <div class="flex items-end justify-end">
               <v-btn
-                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline mb-5"
+                  :disabled="addDescription === '' "
+                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline mb-5
+                   disabledFunction"
                   type="button" @click="estimateDifficulty">
                 Estimate Difficulty
               </v-btn>
@@ -44,9 +51,15 @@
                 Cancel
               </v-btn>
               <v-btn
-                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline"
-                  type="button" @click="addTask">
-                Add Task
+                  :disabled="addName === '' ||
+             addDescription === '' ||
+             addPriority === '' ||
+             addDifficulty === null || addDifficulty === '' || addDifficulty < 0"
+                  class="left-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl focus:outline-none focus:shadow-outline
+                        disabledFunction"
+                  type="button"
+                  @click="addTask"
+              >Add Task
               </v-btn>
             </div>
           </div>
@@ -60,11 +73,11 @@
 export default {
   data() {
     return {
-      currentUser:  this.$store?.state?.currentUser ?? '',
-      addName: this.$store?.state?.addName ?? '',
-      addDescription: this.$store?.state?.addDescription ?? '',
-      addDifficulty: this.$store?.state?.addDifficulty ?? '',
-      addPriority: this.$store?.state?.addPriority ?? 'LOW',
+      currentUser: '',
+      addName: '',
+      addDescription: '',
+      addDifficulty: '',
+      addPriority: 'LOW',
       priorityValues: ['LOW', 'MEDIUM', 'HIGH']
     };
   },
@@ -96,13 +109,23 @@ export default {
   },
   methods: {
     estimateDifficulty() {
-      this.$store?.commit('estimateDifficulty', {text: this.addDescription});
-      this.addDifficulty = this.$store?.state?.addDifficulty;
+      this.$store.dispatch('estimateDifficulty', this.addDescription)
+          .then((difficulty) => {
+            this.addDifficulty = difficulty;
+          })
+          .catch((error) => {
+            console.error('Error estimating difficulty:', error);
+          });
     },
     addTask() {
-      this.$store?.commit('createTask', {name: this.addName, description: this.addDescription, difficulty: this.addDifficulty, priority: this.addPriority, userId: this.currentUser.id,});
+      this.$store?.commit('createTask', {
+        name: this.addName,
+        description: this.addDescription,
+        difficulty: this.addDifficulty,
+        priority: this.addPriority,
+        userId: this.currentUser.id,
+      });
       this.$store?.commit('setShowAddTask', false);
-      this.$store?.commit('setShowTasks', true);
     },
     cancelAdd() {
       this.$store?.commit('setShowAddTask', false);
@@ -128,17 +151,8 @@ export default {
   color: black;
 }
 
-.description{
-  font-size: large;
-  display: flex;
-  justify-content: space-evenly;
-  border: 1px solid #ccc;
-  border-radius: 25px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 85%;
-  height: 94%;
-  padding: 20px;
-
-  margin-bottom: 1%;
+.disabledFunction:disabled {
+  background-color: dodgerblue;
+  opacity: 75%;
 }
 </style>

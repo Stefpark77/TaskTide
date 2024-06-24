@@ -3,6 +3,7 @@ package com.tasktide.taskServices.service;
 import com.tasktide.taskServices.model.Task;
 import com.tasktide.taskServices.repository.TaskRepository;
 import com.tasktide.taskServices.util.PrioritizationSorter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,17 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class TaskService {
-    private TaskRepository taskRepository;
-    private PrioritizationSorter prioritizationSorter;
-    private TaskDependencyService taskDependencyService;
-
-    @Autowired
-    public TaskService(TaskRepository taskRepository, PrioritizationSorter prioritizationSorter, TaskDependencyService taskDependencyService) {
-        this.taskRepository = taskRepository;
-        this.prioritizationSorter = prioritizationSorter;
-        this.taskDependencyService = taskDependencyService;
-    }
+    private final TaskRepository taskRepository;
+    private final PrioritizationSorter prioritizationSorter;
+    private final TaskDependencyService taskDependencyService;
 
     public Task getTaskByTaskId(String taskId) {
         return taskRepository.findTaskById(taskId);

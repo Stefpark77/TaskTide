@@ -15,8 +15,7 @@ public enum Permission {
     USER_CREATE("userCreate"),
     USER_READ("userRead"),
     USER_UPDATE("userUpdate"),
-    USER_DELETE("userDelete")
-    ;
+    USER_DELETE("userDelete");
 
     private final String permission;
 

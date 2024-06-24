@@ -8,17 +8,28 @@
         </div>
       </div>
       <div class="account_info">
-        <a><v-icon icon="mdi-account"/> {{this.$store?.state?.currentUser.username}}</a>
-        <a><v-icon icon="mdi-email-outline"/> {{this.$store?.state?.currentUser.email}}</a>
+        <a>
+          <v-icon icon="mdi-account"/>
+          {{ this.$store?.state?.currentUser.username }}</a>
+        <a>
+          <v-icon icon="mdi-email-outline"/>
+          {{ this.$store?.state?.currentUser.email }}</a>
       </div>
     </div>
     <div class="menu_buttons">
       <v-tabs
           color="#1e90ff"
+          :model-value="this.$store?.state?.showEvents || this.$store?.state?.showEditEvent ||this.$store?.state?.showAddEvent ? 'Agenda' :
+           this.$store?.state?.showProjects || this.$store?.state?.showProjectPage || this.$store?.state?.showEditProject ||this.$store?.state?.showAddProject ? 'Projects' :
+           'Tasks'"
           direction="vertical">
-        <v-tab class="menu_button" prepend-icon="mdi-calendar-clock" text="Agenda" value="Agenda" @click="agenda"></v-tab>
-        <v-tab class="menu_button" prepend-icon="mdi-file-tree" text="Projects" value="Projects" @click="projectsPage"></v-tab>
-        <v-tab class="menu_button" prepend-icon="mdi-bulletin-board" text="Tasks" value="Tasks" @click="tasksPage"></v-tab>
+        <v-tab class="menu_button" prepend-icon="mdi-calendar-clock" text="Agenda" value="Agenda"
+               @click="agenda"></v-tab>
+        <v-tab class="menu_button" prepend-icon="mdi-file-tree" text="Projects" value="Projects"
+               @click="projectsPage"></v-tab>
+        <v-tab class="menu_button" prepend-icon="mdi-bulletin-board" text="Tasks" value="Tasks"
+               @click="tasksPage"></v-tab>
+
       </v-tabs>
     </div>
     <div class="logout_button">
@@ -33,7 +44,9 @@
     </div>
   </div>
   <div class="title">
-    <h1 class="title_text">TASKTIDE <v-icon icon="mdi-checkbox-marked-circle-outline"/></h1>
+    <h1 class="title_text">TASKTIDE
+      <v-icon icon="mdi-checkbox-marked-circle-outline"/>
+    </h1>
   </div>
 </template>
 
@@ -41,8 +54,8 @@
 export default {
   data() {
     return {
-      username:this.$store?.state?.username ?? "Unknown Username",
-      email:this.$store?.state?.email ?? "Unknown Email",
+      username: this.$store?.state?.username ?? "Unknown Username",
+      email: this.$store?.state?.email ?? "Unknown Email",
       events: this.$store?.state?.events ?? [],
       projects: this.$store?.state?.projects ?? [],
       tasks: this.$store?.state?.tasks ?? [],
@@ -65,7 +78,8 @@ export default {
     },
     tasksPage() {
       this.$store?.commit('setShowEvents', false);
-      this.$store?.commit('setShowTasks', true);
+      this.$store?.commit('setShowTasks', false);
+      this.$store?.commit('fetchTasks', true);
       this.$store?.commit('setShowProjects', false);
       this.$store?.commit('setShowAddEvent', false);
       this.$store?.commit('setShowEditEvent', false);
@@ -109,10 +123,11 @@ export default {
   align-content: stretch;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 17px -2px 12px -5px rgba(32,29,29,0.13),
-  0px 1px 1px 0px rgba(0,0,0,0.11);
+  box-shadow: 17px -2px 12px -5px rgba(32, 29, 29, 0.13),
+  0px 1px 1px 0px rgba(0, 0, 0, 0.11);
   z-index: 200;
 }
+
 .title {
   width: 85%;
   height: 6%;
@@ -125,12 +140,14 @@ export default {
   align-items: center;
   display: flex;
   justify-content: center;
-  box-shadow: 14px 17px 12px -5px rgba(32,29,29,0.13), 0px 1px 1px 0px rgba(0,0,0,0.11);
+  box-shadow: 14px 17px 12px -5px rgba(32, 29, 29, 0.13), 0px 1px 1px 0px rgba(0, 0, 0, 0.11);
   z-index: 201;
 }
+
 .title_text {
   margin-right: 75px;
 }
+
 .account {
   display: flex;
   justify-content: center;
@@ -140,6 +157,7 @@ export default {
   padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
 .account_image {
   display: flex;
   width: 150px;
@@ -177,6 +195,7 @@ export default {
   font-weight: bold;
   align-items: center;
 }
+
 .menu_buttons {
   margin-top: 20px;
   display: flex;
@@ -187,7 +206,8 @@ export default {
   font-weight: bold;
   align-items: center;
 }
-.menu_button:hover{
+
+.menu_button:hover {
   background-color: dodgerblue;
   color: white;
   padding: 10px 50px;
@@ -196,7 +216,8 @@ export default {
   justify-content: center;
   font-size: x-large;
 }
-.menu_button{
+
+.menu_button {
   background-color: white;
   padding: 10px 50px;
   font-weight: bold;
@@ -207,13 +228,15 @@ export default {
   margin-up: 10%;
   margin-bottom: 50%;
 }
+
 .logout_button {
-  bottom:0;
+  bottom: 0;
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
   margin-bottom: 30px;
 }
+
 .standard_button {
   background-color: dodgerblue;
   color: white;
@@ -223,6 +246,7 @@ export default {
   justify-content: center;
   font-size: x-large;
 }
+
 .standard_button:hover {
   background-color: royalblue;
   outline: none;
