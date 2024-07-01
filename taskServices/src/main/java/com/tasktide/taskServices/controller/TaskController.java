@@ -29,16 +29,16 @@ public class TaskController {
 
     @GetMapping("/{taskId}/depends-on/")
     @PreAuthorize("hasAnyAuthority({'userRead', 'adminRead'})")
-    public List<Task> getDependsOnTasksByTaskId(@PathVariable String taskId) {
+    public List<Task> getDependedTasksByTaskId(@PathVariable String taskId) {
         log.info("Getting depending task's information for task id {}", taskId);
-        return taskService.getDependsOnTasksByTaskId(taskId);
+        return taskService.getDependedTasksByTaskId(taskId);
     }
 
     @GetMapping("/{dependsOnId}/depended-tasks/")
     @PreAuthorize("hasAnyAuthority({'userRead', 'adminRead'})")
-    public List<Task> getDependedTasksByDependsOnId(@PathVariable String dependsOnId) {
+    public List<Task> getDependingTasksByDependsOnId(@PathVariable String dependsOnId) {
         log.info("Getting depended task's information for task id {}", dependsOnId);
-        return taskService.getDependedTasksByDependsOnId(dependsOnId);
+        return taskService.getDependingTasksByDependsOnId(dependsOnId);
     }
 
 

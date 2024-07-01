@@ -21,10 +21,10 @@ services:
     networks:
       - tasktide
   calendarservices:
-    image: sha256:d80173beca2c267aa6e0620b890c7c9431eab12f5e76d64ea4c2225d8c12e735
+    image: sha256:7b8cc1a0a884e541f4de0b6114a7e5885020b139e4cb2a88abd9d637345e14be
     restart: always
     ports:
-      - 8081:8081
+      - 9001:8081
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tasktide?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
       SPRING_DATASOURCE_USERNAME: root
@@ -34,10 +34,10 @@ services:
     depends_on:
       - mysql
   taskservices:
-    image: sha256:d80173beca2c267aa6e0620b890c7c9431eab12f5e76d64ea4c2225d8c12e735
+    image: sha256:9cdc630734e8cb80186e26b557e5205db96577b629ea570c158738f6c0c9bf81
     restart: always
     ports:
-      - 8081:8081
+      - 9002:8081
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tasktide?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
       SPRING_DATASOURCE_USERNAME: root
@@ -47,10 +47,10 @@ services:
     depends_on:
       - mysql
   projectservices:
-    image: sha256:d80173beca2c267aa6e0620b890c7c9431eab12f5e76d64ea4c2225d8c12e735
+    image: sha256:585f9b1772770ee0fecb1214e8ad3d92d5ffeb0775d84e465a2fa20bf1745bd5
     restart: always
     ports:
-      - 8081:8081
+      - 9003:8081
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tasktide?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
       SPRING_DATASOURCE_USERNAME: root
@@ -60,10 +60,10 @@ services:
     depends_on:
       - mysql
   userservices:
-    image: sha256:cf0d3e157ec74134cc5e83be7e93f54e2fa243ce703506f49cfb97bbcbddcc9a
+    image: sha256:63eabc9fea7de6cb50bae111f79e7a20c4416bd755d29a00e7fba1120cb9557f
     restart: always
     ports:
-      - 8082:8081
+      - 9000:8081
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tasktide?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
       SPRING_DATASOURCE_USERNAME: root
@@ -79,7 +79,7 @@ services:
       - rabbitmq
       - authservices
   authservices:
-    image: sha256:4327b62fa4f1e23c6cb9dbc45d6ae7c38eea15efbd18dab8d56d1feb86b4f1a8
+    image: sha256:d8e1a3d6036f8862d226ed9dd85480b7c8de65c33c52acc1c19314eaf3e27e9a
     restart: always
     ports:
       - 8083:8081

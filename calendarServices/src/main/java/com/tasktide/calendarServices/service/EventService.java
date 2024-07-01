@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -28,6 +30,7 @@ public class EventService {
     public List<Event> getEventsByUserIdAndDay(String userId, Instant day) {
         return eventRepository.findEventsByUserId(userId).stream()
                 .filter(event -> isEventOccurring(event, day))
+                .sorted(Comparator.comparing(x -> x.getDate().atZone(ZoneOffset.UTC).getHour() * 60 + x.getDate().atZone(ZoneOffset.UTC).getMinute()))
                 .toList();
     }
 
@@ -40,7 +43,7 @@ public class EventService {
     }
 
     public Event updateEvent(Event event) {
-        return eventRepository.save(event);
+        return eventRepository.updateEvent(event);
     }
 
     public Event removeEvent(String eventId) {

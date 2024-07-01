@@ -1,10 +1,12 @@
 package com.tasktide.authServices.controller.model.Response;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 @Builder
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class LoginResponse {
     private String token;
     private String userId;

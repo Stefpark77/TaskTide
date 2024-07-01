@@ -3,7 +3,6 @@ package com.tasktide.calendarServices.repository;
 import com.tasktide.calendarServices.model.Event;
 import com.tasktide.calendarServices.repository.interfaces.IEventRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -32,7 +31,7 @@ public class EventRepository {
         return iEventRepository.save(event);
     }
 
-    public Event save(Event event) {
+    public Event updateEvent(Event event) {
         Event newEvent = findEventById(event.getId());
         if (StringUtils.hasLength(event.getName()))
             newEvent.setName(event.getName());

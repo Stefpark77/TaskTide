@@ -3,7 +3,6 @@ package com.tasktide.projectServices.service;
 import com.tasktide.projectServices.model.Project;
 import com.tasktide.projectServices.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -25,7 +24,7 @@ public class ProjectService {
     }
 
     public Project updateProject(Project project) {
-        return projectRepository.save(project);
+        return projectRepository.updateProject(project);
     }
 
     public Project removeProject(String projectId) {

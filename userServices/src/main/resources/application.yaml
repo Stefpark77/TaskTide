@@ -3,7 +3,7 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: jdbc:mysql://localhost:3306/tasktide
+    url: jdbc:mysql://localhost:3307/tasktide
     username: root
     password: Stefpark77$
   rabbitmq:
@@ -21,7 +21,7 @@ rabbitmq:
 server:
   servlet:
     context-path: /userServices
-  port: 9000
+  port: 8081
 
 security:
   jwt:

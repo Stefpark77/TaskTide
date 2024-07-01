@@ -4,7 +4,6 @@ import com.tasktide.taskServices.model.Task;
 import com.tasktide.taskServices.repository.TaskRepository;
 import com.tasktide.taskServices.util.PrioritizationSorter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -45,21 +44,21 @@ public class TaskService {
     }
 
     public Task updateTask(Task task) {
-        return taskRepository.save(task);
+        return taskRepository.updateTask(task);
     }
 
     public Task removeTask(String taskId) {
         return taskRepository.deleteTask(taskId);
     }
 
-    public List<Task> getDependsOnTasksByTaskId(String taskId) {
+    public List<Task> getDependedTasksByTaskId(String taskId) {
         return taskDependencyService.getTaskDependenciesByTaskId(taskId).stream()
                 .map(dependency -> getTaskByTaskId(dependency.getDependsOnId()))
                 .toList();
 
     }
 
-    public List<Task> getDependedTasksByDependsOnId(String dependsOnId) {
+    public List<Task> getDependingTasksByDependsOnId(String dependsOnId) {
         return taskDependencyService.getTaskDependenciesByDependsOnId(dependsOnId).stream()
                 .map(dependency -> getTaskByTaskId(dependency.getTaskId()))
                 .toList();

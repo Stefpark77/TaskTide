@@ -35,7 +35,7 @@ public class TaskRepository {
         return iTaskRepository.save(task);
     }
 
-    public Task save(Task task) {
+    public Task updateTask(Task task) {
         Task newTask = findTaskById(task.getId());
         if (StringUtils.hasLength(task.getName()))
             newTask.setName(task.getName());

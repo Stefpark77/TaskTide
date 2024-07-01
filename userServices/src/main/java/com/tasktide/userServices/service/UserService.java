@@ -20,8 +20,8 @@ public class UserService {
         return userRepository.findUserByUsername(username);
     }
 
-    public List<User> getUserByProjectId(String projectId) {
-        return userRepository.findUserByProjectId(projectId);
+    public List<User> getUsersByProjectId(String projectId) {
+        return userRepository.findUsersByProjectId(projectId);
     }
 
     public List<User> getAllUsers() {
@@ -33,7 +33,7 @@ public class UserService {
     }
 
     public User updateUser(User user) {
-        return userRepository.save(user);
+        return userRepository.updateUser(user);
     }
 
     public User removeUser(String userId) {

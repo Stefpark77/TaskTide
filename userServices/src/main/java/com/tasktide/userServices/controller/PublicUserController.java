@@ -33,9 +33,9 @@ public class PublicUserController {
 
     @GetMapping("/projectId/{projectId}")
     @PreAuthorize("hasAnyAuthority({'userRead', 'adminRead'})")
-    public List<User> getUserByProjectId(@PathVariable String projectId) {
+    public List<User> getUsersByProjectId(@PathVariable String projectId) {
         log.info("Getting user information by project id {}", projectId);
-        return userService.getUserByProjectId(projectId);
+        return userService.getUsersByProjectId(projectId);
     }
 
 }

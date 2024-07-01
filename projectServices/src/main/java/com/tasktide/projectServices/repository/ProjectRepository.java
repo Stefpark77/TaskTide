@@ -3,7 +3,6 @@ package com.tasktide.projectServices.repository;
 import com.tasktide.projectServices.model.Project;
 import com.tasktide.projectServices.repository.interfaces.IProjectRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -28,7 +27,7 @@ public class ProjectRepository {
         return iProjectRepository.save(project);
     }
 
-    public Project save(Project project) {
+    public Project updateProject(Project project) {
         Project newProject = findProjectById(project.getId());
         if (StringUtils.hasLength(project.getName()))
             newProject.setName(project.getName());

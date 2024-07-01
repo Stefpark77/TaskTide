@@ -14,17 +14,18 @@ import java.util.List;
 public class AuthService {
     private final AuthRepository authRepository;
 
-    public User getUserByUsername(String username) {
-        List<User> userList = authRepository.findUsersByUsername(username);
-        return CollectionUtils.isEmpty(userList) ? null : userList.get(0);
-    }
-
     public User loginUser(String username, String password) {
         User user = getUserByUsername(username);
-        if (!BCryptPasswordEncoder.match(password, user.getHashedPassword())) {
+        if (user == null || !BCryptPasswordEncoder.match(password, user.getHashedPassword())) {
             return null;
         }
         return user;
     }
+
+    private User getUserByUsername(String username) {
+        List<User> userList = authRepository.findUsersByUsername(username);
+        return CollectionUtils.isEmpty(userList) ? null : userList.getFirst();
+    }
+
 
 }

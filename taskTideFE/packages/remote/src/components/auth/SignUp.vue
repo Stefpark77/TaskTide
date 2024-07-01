@@ -126,3 +126,18 @@ export default {
   },
 };
 </script>
+
+
+<style>
+
+.left_image_signup {
+  width: 50%;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  background-color: red;
+  background-repeat: repeat;
+  border-right: 10px solid gray;
+  background-image: url("https://media.istockphoto.com/id/1469214984/photo/welcome-written-speech-bubble-and-blue-megaphone-on-blue-background.webp?b=1&s=170667a&w=0&k=20&c=uxjvmYQaojVUxMSxJBaunTYvp1g5Zuco1YMq55W6s2o=");
+}
+</style>

@@ -8,13 +8,13 @@ from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 import joblib
 
-# Download NLTK resources
+# NLTK resources
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('wordnet')
 nltk.download('stopwords')
-
 stop_words = set(stopwords.words('english'))
+
 
 def get_wordnet_pos(tag):
     if tag.startswith('J'):
@@ -29,7 +29,7 @@ def get_wordnet_pos(tag):
         return wordnet.NOUN
 
 
-# Function to perform lemmatization
+# Lemmatization
 def lemmatize_text(text):
     lemmatizer = WordNetLemmatizer()
     tokens = nltk.word_tokenize(text)
@@ -40,42 +40,38 @@ def lemmatize_text(text):
     return ' '.join(filtered_sentences2)
 
 
-df = pd.read_csv('trainData2.csv',  delimiter=';')
+df = pd.read_csv('trainData.csv', delimiter=';')
 df['text_lemmatized'] = df['text'].apply(lemmatize_text)
 
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(df['text_lemmatized'], df['difficulty'], test_size=0.2, random_state=42)
+# Splitting data (20% / 80%)
+X_train, X_test, y_train, y_test = train_test_split(df['text_lemmatized'], df['difficulty'], test_size=0.2,
+                                                    random_state=42)
 
-# Vectorize the text data using TF-IDF
-vectorizer = TfidfVectorizer(max_features=1000)  # You can adjust max_features based on your dataset size
+# Vectorization ( TF-IDF )
+vectorizer = TfidfVectorizer(max_features=1000)
 X_train_vectorized = vectorizer.fit_transform(X_train)
 X_test_vectorized = vectorizer.transform(X_test)
 
-# Train a Support Vector Classifier (SVC) model
+# Support Vector Classifier
 classifier = SVC()
 classifier.fit(X_train_vectorized, y_train)
 
-# Evaluate the model
+# Evaluation:
 y_pred = classifier.predict(X_test_vectorized)
 accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy:", accuracy)
-# Evaluate the model
-
-# Confusion Matrix
 conf_matrix = confusion_matrix(y_test, y_pred)
 print("Confusion Matrix:")
 print(conf_matrix)
-
-# Classification Report
 print("Classification Report:")
 print(classification_report(y_test, y_pred))
 
-test_text = "Design a hello world program."
+# Specific Test
+test_text = "Design an easy simple hello world program."
 test_text_lemmatized = lemmatize_text(test_text)
 test_text_vectorized = vectorizer.transform([test_text_lemmatized])
 predicted_difficulty = classifier.predict(test_text_vectorized)
 print("Predicted Difficulty:", predicted_difficulty[0])
-
 
 # Save the trained model
 joblib.dump(classifier, 'classifier_model.pkl')
