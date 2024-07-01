@@ -62,7 +62,7 @@
                     icon="mdi-checkbox-blank-outline"
                     start
                 ></v-icon>
-                {{ task.name.length > 30 ? task.name.slice(0, 30) + '..' : task.name }}
+                {{ task.name.length > 28 ? task.name.slice(0, 28) + '..' : task.name }}
               </a></div>
               <v-spacer></v-spacer>
 

@@ -109,7 +109,7 @@ export default {
       updateDescription: this.$store?.state?.updateDescription ?? '',
       updateDate: this.$store?.state?.updateDate ?? '',
       updateEndDate: this.$store?.state?.updateEndDate ?? '',
-      updateEndDateTime: '',
+      updateEndDateTime: this.$store?.state?.updateEndDateTime ?? '',
       fullDay: parseISO(this.$store?.state?.updateDate).getDate() === parseISO(this.$store?.state?.updateEndDate).getDate()
           && parseISO(this.$store?.state?.updateDate).getHours() === 0 && parseISO(this.$store?.state?.updateDate).getMinutes() === 0
           && parseISO(this.$store?.state?.updateEndDate).getHours() === 23 && parseISO(this.$store?.state?.updateEndDate).getMinutes() === 59,

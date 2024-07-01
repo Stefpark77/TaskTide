@@ -229,7 +229,7 @@ export default {
           format(parseISO(event.endDate), "MMMM dd, yyyy") !== format(dayOfEvent, "MMMM dd, yyyy")) {
         return '23:59';
       }
-      return format(parseISO(event.date), "HH:mm");
+      return format(parseISO(event.endDate), "HH:mm");
     },
   },
 };

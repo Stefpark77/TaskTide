@@ -21,7 +21,7 @@ services:
     networks:
       - tasktide
   calendarservices:
-    image: sha256:7b8cc1a0a884e541f4de0b6114a7e5885020b139e4cb2a88abd9d637345e14be
+    image: sha256:251c506af34d516b476340f298be2845de6354bc8eb5f4541691e45be8dd10b9
     restart: always
     ports:
       - 9001:8081

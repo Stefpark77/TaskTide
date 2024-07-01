@@ -189,11 +189,11 @@ const store = createStore({
         },
         async prepareMenu(state) {
             try {
-                if(state.token===''){
+                if (state.token === '') {
                     state.token = localStorage.getItem("token");
                 }
-                if(state.currentUser===''){
-                    state.currentUser= {id: localStorage.getItem("userId")}
+                if (state.currentUser === '') {
+                    state.currentUser = {id: localStorage.getItem("userId")}
                 }
                 const response = await getUserByUserId(state.currentUser.id, state.token);
 
@@ -210,10 +210,10 @@ const store = createStore({
         /*Calendar Services*/
         async fetchWeekEvents(state, firstDay) {
             try {
-                if(state.token===''){
+                if (state.token === '') {
                     state.token = localStorage.getItem("token");
                 }
-                if(state.currentUser===''){
+                if (state.currentUser === '') {
                     state.currentUser = {id: localStorage.getItem("userId")}
                 }
                 var curr;
@@ -223,7 +223,7 @@ const store = createStore({
                     const currentDay = curr.getDate() - curr.getDay() + 1;
                     currentDate = new Date(curr.setDate(currentDay));
                 } else {
-                    currentDate= firstDay;
+                    currentDate = firstDay;
                 }
                 let index = 0;
                 while (index < 7) {
@@ -301,9 +301,12 @@ const store = createStore({
             state.updateEndDate = format(parseISO(event.endDate), "yyyy-MM-dd'T'HH:mm:ss");
 
             if (parseISO(state.updateDate).getDate() === parseISO(state.updateEndDate).getDate()
-            && parseISO(state.updateDate).getHours() === 0 && parseISO(state.updateDate).getMinutes() === 0
-            && parseISO(state.updateEndDate).getHours() === 23 && parseISO(state.updateEndDate).getMinutes() === 59){
+                && parseISO(state.updateDate).getHours() === 0 && parseISO(state.updateDate).getMinutes() === 0
+                && parseISO(state.updateEndDate).getHours() === 23 && parseISO(state.updateEndDate).getMinutes() === 59) {
                 state.updateDate = format(parseISO(event.date), "yyyy-MM-dd");
+            }
+            if (event.recurringTime !== 'ONCE') {
+                state.updateEndDateTime = parseISO(state.updateEndDate).getHours() + ":" + parseISO(state.updateEndDate).getMinutes();
             }
             state.updateRecurring = event.recurringTime;
 
@@ -361,11 +364,11 @@ const store = createStore({
         },
         async fetchTasks(state, showTasks) {
             try {
-                if(state.token===''){
+                if (state.token === '') {
                     state.token = localStorage.getItem("token");
                 }
-                if(state.currentUser===''){
-                    state.currentUser= {id: localStorage.getItem("userId")}
+                if (state.currentUser === '') {
+                    state.currentUser = {id: localStorage.getItem("userId")}
                 }
                 const responseProjects = await getProjectByUserId(state.currentUser.id, state.token);
 
@@ -399,7 +402,7 @@ const store = createStore({
                     updatedTasks.push(task);
                 }
                 state.tasks = updatedTasks;
-                if(showTasks === true){
+                if (showTasks === true) {
                     state.showTasks = true;
                 }
             } catch (error) {
@@ -605,8 +608,8 @@ const store = createStore({
                 checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to delete task dependency');
-                await this.commit("fetchTaskDependenciesByDependsOnId",state.task.id)
-                await this.commit("fetchTaskDependenciesByTaskId",state.task.id)
+                await this.commit("fetchTaskDependenciesByDependsOnId", state.task.id)
+                await this.commit("fetchTaskDependenciesByTaskId", state.task.id)
 
 
             } catch (error) {
@@ -620,8 +623,8 @@ const store = createStore({
                 checkAuth(response);
 
                 if (response.status !== 200) throw new Error('Failed to create task dependency');
-                await this.commit("fetchTaskDependenciesByDependsOnId",state.task.id)
-                await this.commit("fetchTaskDependenciesByTaskId",state.task.id)
+                await this.commit("fetchTaskDependenciesByDependsOnId", state.task.id)
+                await this.commit("fetchTaskDependenciesByTaskId", state.task.id)
 
             } catch (error) {
                 console.error(error);
@@ -630,7 +633,7 @@ const store = createStore({
 
         /*Project Services*/
         async fetchProjects(state) {
-            if(state.token===''){
+            if (state.token === '') {
                 state.token = localStorage.getItem("token");
             }
             try {
@@ -891,7 +894,7 @@ const store = createStore({
             state.showTaskPage = showTaskPage;
         },
     },
-    actions:{
+    actions: {
         async estimateDifficulty({commit}, description) {
             try {
                 const response = await getEstimatedDifficulty({text: description});

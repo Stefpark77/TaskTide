@@ -37,7 +37,8 @@
                     icon="mdi-text-box-multiple-outline"
                     start
                 ></v-icon>
-                {{ project.name }}</a></div>
+                {{ project.name.length > 28 ? project.name.slice(0, 28) + '..' : project.name }}
+              </a></div>
               <v-spacer></v-spacer>
 
               <v-chip
